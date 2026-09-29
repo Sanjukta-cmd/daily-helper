@@ -107,6 +107,12 @@
             <p id="login-pwd-error" class="text-xs text-red-600 font-bold mt-1.5 hidden"></p>
           </div>
 
+          <div class="flex justify-end">
+            <button type="button" onclick="showPasswordRecovery()" class="text-xs font-bold text-amber-700 hover:underline cursor-pointer">
+              🔑 Forgot Password?
+            </button>
+          </div>
+
           <button type="button" onclick="handleVerifyPassword()" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-base sm:text-lg shadow-md transition active:scale-95 cursor-pointer">
             🔓 Unlock Profile
           </button>
@@ -119,7 +125,43 @@
         </div>
       </div>
 
-      <!-- Registration Form (Pure Div Container, Never Submits Form/Refreshes Page) -->
+      <!-- Password Recovery Screen -->
+      <div id="login-recovery-box" class="space-y-4 hidden">
+        <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-2xl">
+          <h3 class="font-bold text-amber-950 text-base">Reset Profile Password</h3>
+          <p id="recovery-user-prompt" class="text-xs text-amber-800 mt-0.5 font-medium"></p>
+        </div>
+
+        <div>
+          <label id="recovery-question-label" class="block text-sm font-bold text-slate-700 mb-1">Security Question</label>
+          <input id="recovery-answer-input" type="text" placeholder="Enter your secret answer" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-semibold text-slate-900">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">New Password *</label>
+            <input id="recovery-new-password" type="password" autocomplete="new-password" placeholder="New password" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 text-slate-900">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Confirm New Password *</label>
+            <input id="recovery-confirm-password" type="password" autocomplete="new-password" placeholder="Confirm password" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 text-slate-900">
+          </div>
+        </div>
+
+        <p id="recovery-error-msg" class="text-xs text-red-600 font-bold hidden"></p>
+
+        <button type="button" onclick="handleExecutePasswordReset()" class="btn-touch w-full rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-base shadow-md transition active:scale-95 cursor-pointer">
+          🔄 Reset Password & Enter
+        </button>
+
+        <div class="text-center pt-1">
+          <button type="button" onclick="setLoginViewMode('password')" class="text-xs font-bold text-slate-500 hover:underline cursor-pointer">
+            ← Cancel & Back to Login
+          </button>
+        </div>
+      </div>
+
+      <!-- Registration Form (Pure Div Container, Never Reloads Page) -->
       <div id="login-register-form" class="space-y-4">
         <div class="flex items-center justify-between border-b pb-2">
           <h2 class="font-bold text-slate-900 text-base">Create Personal Profile</h2>
@@ -157,6 +199,21 @@
             <input id="login-confirm-password" type="password" autocomplete="new-password" placeholder="Re-enter password" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 text-slate-900">
           </div>
         </div>
+
+        <!-- Security Question for Safe Password Recovery -->
+        <div class="p-3.5 bg-amber-50 rounded-2xl border border-amber-200 space-y-2">
+          <label class="block text-xs font-bold text-amber-950 uppercase tracking-wide">
+            🔑 Password Recovery Question (Keep safe)
+          </label>
+          <select id="login-sec-question" class="input-touch w-full px-3 rounded-xl border-2 border-amber-300 bg-white text-xs sm:text-sm font-semibold text-slate-800">
+            <option value="What is the name of your childhood best friend?">What is the name of your childhood best friend?</option>
+            <option value="In what city were you born?">In what city were you born?</option>
+            <option value="What was your first school name?">What was your first school name?</option>
+            <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+          </select>
+          <input id="login-sec-answer" type="text" placeholder="Your secret answer (e.g. Milli, Cuttack)" class="input-touch w-full px-4 rounded-xl border-2 border-amber-300 bg-white font-semibold text-slate-900">
+        </div>
+
         <p id="reg-pwd-error" class="text-xs text-red-600 font-bold hidden"></p>
 
         <div class="grid grid-cols-2 gap-3">
@@ -1109,7 +1166,7 @@
         btnSaveVital: "📊 স্বাস্থ্য record সংরক্ষণ করুন",
         vitalsRecent: "সাম্প্রতিক রিপোর্ট",
         btnPrintVitals: "🖨️ ডাক্তারের জন্য প্রিন্ট",
-        helplinesHeading: "🚨 ২৪/୭ জরুরি হেল্পলাইন নম্বর",
+        helplinesHeading: "🚨 ২৪/৭ জরুরি হেল্পলাইন নম্বর",
         police: "পুলিশ / জরুরি সেবা",
         ambulance: "অ্যাম্বুলেন্স",
         fire: "দমকল বিভাগ",
@@ -1256,6 +1313,7 @@
     let db;
     let currentProfile = null;
     let allProfiles = [];
+    let recoveryTargetUser = null;
 
     let userTodos = [], userExpenses = [], userMeds = [], userMedLogs = [], userWhere = [], userBills = [], userVitals = [], userContacts = [];
     let currentExpImage = null;
@@ -1376,6 +1434,7 @@
       document.getElementById('login-email').value = '';
       document.getElementById('login-password').value = '';
       document.getElementById('login-confirm-password').value = '';
+      document.getElementById('login-sec-answer').value = '';
       document.getElementById('login-photo-input').value = '';
       document.getElementById('reg-pwd-error').classList.add('hidden');
 
@@ -1447,15 +1506,86 @@
       }
     }
 
+    function showPasswordRecovery() {
+      const userId = document.getElementById('login-pwd-userid').value;
+      recoveryTargetUser = allProfiles.find(p => p.id === userId);
+      if (!recoveryTargetUser) return;
+
+      document.getElementById('recovery-user-prompt').textContent = `Resetting password for: ${recoveryTargetUser.name}`;
+      document.getElementById('recovery-question-label').textContent = recoveryTargetUser.securityQuestion || "What is the name of your childhood best friend?";
+      document.getElementById('recovery-answer-input').value = '';
+      document.getElementById('recovery-new-password').value = '';
+      document.getElementById('recovery-confirm-password').value = '';
+      document.getElementById('recovery-error-msg').classList.add('hidden');
+
+      setLoginViewMode('recovery');
+    }
+
+    async function handleExecutePasswordReset() {
+      if (!recoveryTargetUser) return;
+
+      const answer = (document.getElementById('recovery-answer-input').value || '').trim().toLowerCase();
+      const newPwd = (document.getElementById('recovery-new-password').value || '');
+      const confirmPwd = (document.getElementById('recovery-confirm-password').value || '');
+      const errEl = document.getElementById('recovery-error-msg');
+
+      if (!answer) {
+        errEl.textContent = "Please enter your security question answer.";
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      if (recoveryTargetUser.securityAnswer && recoveryTargetUser.securityAnswer !== answer) {
+        errEl.textContent = "Incorrect answer to security question.";
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      if (!newPwd) {
+        errEl.textContent = "Please enter a new password.";
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      if (newPwd !== confirmPwd) {
+        errEl.textContent = "New passwords do not match.";
+        errEl.classList.remove('hidden');
+        return;
+      }
+
+      recoveryTargetUser.password = newPwd;
+
+      // Update LocalStorage
+      let localList = [];
+      try {
+        localList = JSON.parse(localStorage.getItem('daily_helper_profiles') || '[]');
+      } catch (err) {}
+      const idx = localList.findIndex(p => p.id === recoveryTargetUser.id);
+      if (idx !== -1) {
+        localList[idx].password = newPwd;
+        localStorage.setItem('daily_helper_profiles', JSON.stringify(localList));
+      }
+      allProfiles = localList;
+
+      // Update IndexedDB
+      await dbPut('profiles', recoveryTargetUser);
+
+      alert("Password reset successfully! Logging you in...");
+      errEl.classList.add('hidden');
+      loginAsUser(recoveryTargetUser.id);
+    }
+
     function setLoginViewMode(mode) {
       const regForm = document.getElementById('login-register-form');
       const existingBox = document.getElementById('login-existing-box');
       const passwordBox = document.getElementById('login-password-box');
+      const recoveryBox = document.getElementById('login-recovery-box');
       const cancelBtn = document.getElementById('login-cancel-reg-box');
 
       regForm.classList.add('hidden');
       existingBox.classList.add('hidden');
       passwordBox.classList.add('hidden');
+      if (recoveryBox) recoveryBox.classList.add('hidden');
 
       if (mode === 'register') {
         regForm.classList.remove('hidden');
@@ -1466,6 +1596,8 @@
         }
       } else if (mode === 'password') {
         passwordBox.classList.remove('hidden');
+      } else if (mode === 'recovery') {
+        if (recoveryBox) recoveryBox.classList.remove('hidden');
       } else {
         existingBox.classList.remove('hidden');
       }
@@ -1500,18 +1632,20 @@
       const email = (document.getElementById('login-email').value || '').trim();
       const password = (document.getElementById('login-password').value || '');
       const confirmPassword = (document.getElementById('login-confirm-password').value || '');
+      const secQuestion = document.getElementById('login-sec-question').value;
+      const secAnswer = (document.getElementById('login-sec-answer').value || '').trim().toLowerCase();
       const lang = document.getElementById('login-lang').value || 'en';
       const size = document.getElementById('login-size').value || 'normal';
       const errEl = document.getElementById('reg-pwd-error');
 
       if (!name) {
-        alert("Please enter your name");
+        alert("Please enter your name.");
         document.getElementById('login-name').focus();
         return;
       }
 
       if (!password) {
-        alert("Please create a password");
+        alert("Please create a password.");
         document.getElementById('login-password').focus();
         return;
       }
@@ -1525,6 +1659,13 @@
         }
         return;
       }
+
+      if (!secAnswer) {
+        alert("Please enter an answer to your recovery security question.");
+        document.getElementById('login-sec-answer').focus();
+        return;
+      }
+
       if (errEl) errEl.classList.add('hidden');
 
       const newUser = {
@@ -1532,6 +1673,8 @@
         name: name,
         email: email,
         password: password,
+        securityQuestion: secQuestion,
+        securityAnswer: secAnswer,
         photo: loginTempPhoto || null,
         language: lang,
         textSize: size,
