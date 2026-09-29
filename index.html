@@ -83,7 +83,7 @@
         <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Select Profile to Sign In:</label>
         <div id="login-existing-user-list" class="space-y-2.5 max-h-56 overflow-y-auto pr-1"></div>
         <div class="pt-2 text-center border-t border-slate-100">
-          <button type="button" onclick="setLoginViewMode('register')" class="text-sm font-bold text-brand-700 hover:underline">
+          <button type="button" onclick="setLoginViewMode('register')" class="text-sm font-bold text-brand-700 hover:underline cursor-pointer">
             ➕ Register New Personal Profile
           </button>
         </div>
@@ -99,28 +99,28 @@
           </div>
         </div>
 
-        <form onsubmit="handleVerifyPassword(event)" class="space-y-4">
+        <div class="space-y-4">
           <input type="hidden" id="login-pwd-userid">
           <div>
             <label class="block text-sm font-bold text-slate-700 mb-1">Enter Password *</label>
-            <input id="login-pwd-input" type="password" placeholder="Enter your password" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-semibold text-slate-900" required>
+            <input id="login-pwd-input" type="password" autocomplete="current-password" placeholder="Enter your password" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-semibold text-slate-900">
             <p id="login-pwd-error" class="text-xs text-red-600 font-bold mt-1.5 hidden"></p>
           </div>
 
-          <button type="submit" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-base sm:text-lg shadow-md transition active:scale-95">
+          <button type="button" onclick="handleVerifyPassword()" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-base sm:text-lg shadow-md transition active:scale-95 cursor-pointer">
             🔓 Unlock Profile
           </button>
 
           <div class="text-center pt-1">
-            <button type="button" onclick="setLoginViewMode('select')" class="text-xs font-bold text-slate-500 hover:underline">
+            <button type="button" onclick="setLoginViewMode('select')" class="text-xs font-bold text-slate-500 hover:underline cursor-pointer">
               ← Switch to Another Profile
             </button>
           </div>
-        </form>
+        </div>
       </div>
 
-      <!-- Registration Form -->
-      <form id="login-register-form" onsubmit="handleAuthRegister(event)" class="space-y-4">
+      <!-- Registration Form (Pure Div Container, Never Submits Form/Refreshes Page) -->
+      <div id="login-register-form" class="space-y-4">
         <div class="flex items-center justify-between border-b pb-2">
           <h2 class="font-bold text-slate-900 text-base">Create Personal Profile</h2>
           <span class="text-xs bg-brand-50 text-brand-700 px-2.5 py-0.5 rounded-full font-bold">New User</span>
@@ -139,7 +139,7 @@
 
         <div>
           <label class="block text-sm font-bold text-slate-700 mb-1">Full Name *</label>
-          <input id="login-name" type="text" placeholder="e.g. Ramesh Sahoo" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-semibold text-slate-900" required>
+          <input id="login-name" type="text" placeholder="e.g. Ramesh Sahoo" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-semibold text-slate-900">
         </div>
 
         <div>
@@ -150,11 +150,11 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-sm font-bold text-slate-700 mb-1">Password *</label>
-            <input id="login-password" type="password" placeholder="Create a password" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 text-slate-900" required>
+            <input id="login-password" type="password" autocomplete="new-password" placeholder="Create a password" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 text-slate-900">
           </div>
           <div>
             <label class="block text-sm font-bold text-slate-700 mb-1">Confirm Password *</label>
-            <input id="login-confirm-password" type="password" placeholder="Re-enter password" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 text-slate-900" required>
+            <input id="login-confirm-password" type="password" autocomplete="new-password" placeholder="Re-enter password" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 text-slate-900">
           </div>
         </div>
         <p id="reg-pwd-error" class="text-xs text-red-600 font-bold hidden"></p>
@@ -180,16 +180,16 @@
           </div>
         </div>
 
-        <button type="submit" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-base sm:text-lg shadow-md transition active:scale-95">
+        <button type="button" onclick="handleAuthRegister()" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-base sm:text-lg shadow-md transition active:scale-95 cursor-pointer">
           💾 Create & Enter Application
         </button>
 
         <div id="login-cancel-reg-box" class="text-center pt-1 hidden">
-          <button type="button" onclick="setLoginViewMode('select')" class="text-xs font-bold text-slate-500 hover:underline">
+          <button type="button" onclick="setLoginViewMode('select')" class="text-xs font-bold text-slate-500 hover:underline cursor-pointer">
             ← Back to Saved Profiles
           </button>
         </div>
-      </form>
+      </div>
 
     </div>
   </section>
@@ -202,7 +202,7 @@
     <header class="bg-white border-b-2 border-slate-200 sticky top-0 z-30 shadow-sm">
       <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-3">
-          <button onclick="switchTab('profile')" class="flex items-center gap-2.5 p-1 rounded-2xl hover:bg-slate-100 transition" title="Manage Profile">
+          <button onclick="switchTab('profile')" class="flex items-center gap-2.5 p-1 rounded-2xl hover:bg-slate-100 transition cursor-pointer" title="Manage Profile">
             <div id="header-avatar-box" class="w-11 h-11 rounded-full bg-brand-600 text-white font-black text-lg flex items-center justify-center border-2 border-brand-700 overflow-hidden">
               <span id="header-avatar-initials">U</span>
             </div>
@@ -215,10 +215,10 @@
 
         <!-- Controls: Profile Switcher, Language, Font, Sign Out, Backup -->
         <div class="flex items-center gap-1.5 flex-wrap">
-          <select id="profile-quick-select" onchange="handleQuickSwitchUser(this.value)" class="px-2.5 py-1.5 rounded-xl font-bold text-xs sm:text-sm bg-slate-100 text-slate-800 border border-slate-300">
+          <select id="profile-quick-select" onchange="handleQuickSwitchUser(this.value)" class="px-2.5 py-1.5 rounded-xl font-bold text-xs sm:text-sm bg-slate-100 text-slate-800 border border-slate-300 cursor-pointer">
           </select>
 
-          <select id="lang-select" onchange="changeLanguage(this.value)" class="px-2 py-1.5 rounded-xl font-bold text-xs sm:text-sm bg-slate-100 text-slate-800 border border-slate-300">
+          <select id="lang-select" onchange="changeLanguage(this.value)" class="px-2 py-1.5 rounded-xl font-bold text-xs sm:text-sm bg-slate-100 text-slate-800 border border-slate-300 cursor-pointer">
             <option value="en">English</option>
             <option value="or">ଓଡ଼ିଆ (Odia)</option>
             <option value="hi">हिन्दी (Hindi)</option>
@@ -226,16 +226,16 @@
           </select>
 
           <div class="flex items-center gap-0.5 bg-slate-100 p-1 rounded-xl border border-slate-300">
-            <button onclick="setFontSize('normal')" class="px-2 py-0.5 rounded font-bold text-xs bg-white text-brand-700 shadow">A</button>
-            <button onclick="setFontSize('large')" class="px-2 py-0.5 rounded font-bold text-xs text-slate-600">A+</button>
-            <button onclick="setFontSize('xlarge')" class="px-2 py-0.5 rounded font-bold text-xs text-slate-600">A++</button>
+            <button onclick="setFontSize('normal')" class="px-2 py-0.5 rounded font-bold text-xs bg-white text-brand-700 shadow cursor-pointer">A</button>
+            <button onclick="setFontSize('large')" class="px-2 py-0.5 rounded font-bold text-xs text-slate-600 cursor-pointer">A+</button>
+            <button onclick="setFontSize('xlarge')" class="px-2 py-0.5 rounded font-bold text-xs text-slate-600 cursor-pointer">A++</button>
           </div>
 
-          <button onclick="signOutProfile()" class="px-2.5 py-1.5 rounded-xl font-bold text-xs bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 shadow-sm" title="Log Out & Lock Screen">
+          <button onclick="signOutProfile()" class="px-2.5 py-1.5 rounded-xl font-bold text-xs bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 shadow-sm cursor-pointer" title="Log Out & Lock Screen">
             🚪 Sign Out
           </button>
 
-          <button onclick="downloadDatabaseBackup()" class="px-2.5 py-1.5 rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-700 text-white shadow">💾 Backup</button>
+          <button onclick="downloadDatabaseBackup()" class="px-2.5 py-1.5 rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-700 text-white shadow cursor-pointer">💾 Backup</button>
         </div>
       </div>
 
@@ -248,9 +248,9 @@
             <span id="water-count-display" class="font-extrabold text-sky-800 bg-white border border-sky-300 px-3 py-0.5 rounded-full text-sm">0 / 8 Glasses</span>
           </div>
           <div class="flex items-center gap-2">
-            <button id="btn-water-less" onclick="logWater(-1)" class="btn-touch px-3 bg-white border border-sky-300 hover:bg-sky-100 rounded-xl font-bold text-sm">➖ Less</button>
-            <button id="btn-water-add" onclick="logWater(1)" class="btn-touch px-4 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-bold text-sm shadow">🥛 Add Glass</button>
-            <button onclick="resetWater()" class="btn-touch px-2.5 bg-slate-100 border border-slate-300 hover:bg-slate-200 rounded-xl font-bold text-xs text-slate-600" title="Reset Today">↺</button>
+            <button id="btn-water-less" onclick="logWater(-1)" class="btn-touch px-3 bg-white border border-sky-300 hover:bg-sky-100 rounded-xl font-bold text-sm cursor-pointer">➖ Less</button>
+            <button id="btn-water-add" onclick="logWater(1)" class="btn-touch px-4 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-bold text-sm shadow cursor-pointer">🥛 Add Glass</button>
+            <button onclick="resetWater()" class="btn-touch px-2.5 bg-slate-100 border border-slate-300 hover:bg-slate-200 rounded-xl font-bold text-xs text-slate-600 cursor-pointer" title="Reset Today">↺</button>
           </div>
         </div>
       </div>
@@ -263,32 +263,32 @@
       <nav class="space-y-2 mb-6" aria-label="Main Sections">
         <!-- Row 1 -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <button id="tab-todos" onclick="switchTab('todos')" class="btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition shadow border-2 border-brand-600 bg-brand-600 text-white flex items-center justify-center gap-1.5">
+          <button id="tab-todos" onclick="switchTab('todos')" class="btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition shadow border-2 border-brand-600 bg-brand-600 text-white flex items-center justify-center gap-1.5 cursor-pointer">
             <span id="txt-tab-todos">🗓️ 1. 7-Day To-Do</span>
           </button>
-          <button id="tab-expenses" onclick="switchTab('expenses')" class="btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition border-2 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5">
+          <button id="tab-expenses" onclick="switchTab('expenses')" class="btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition border-2 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5 cursor-pointer">
             <span id="txt-tab-expenses">💰 2. Expenses</span>
           </button>
-          <button id="tab-meds" onclick="switchTab('meds')" class="btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition border-2 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5">
+          <button id="tab-meds" onclick="switchTab('meds')" class="btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition border-2 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5 cursor-pointer">
             <span id="txt-tab-meds">💊 3. Medicines</span>
           </button>
-          <button id="tab-where" onclick="switchTab('where')" class="btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition border-2 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5">
+          <button id="tab-where" onclick="switchTab('where')" class="btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition border-2 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5 cursor-pointer">
             <span id="txt-tab-where">🔍 4. Find Item</span>
           </button>
         </div>
 
         <!-- Row 2 -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <button id="tab-bills" onclick="switchTab('bills')" class="btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition border-2 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5">
+          <button id="tab-bills" onclick="switchTab('bills')" class="btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition border-2 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5 cursor-pointer">
             <span id="txt-tab-bills">📅 5. Recurring Bills</span>
           </button>
-          <button id="tab-vitals" onclick="switchTab('vitals')" class="btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition border-2 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5">
+          <button id="tab-vitals" onclick="switchTab('vitals')" class="btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition border-2 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5 cursor-pointer">
             <span id="txt-tab-vitals">🩺 6. Health Vitals</span>
           </button>
-          <button id="tab-contacts" onclick="switchTab('contacts')" class="btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition border-2 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5">
+          <button id="tab-contacts" onclick="switchTab('contacts')" class="btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition border-2 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5 cursor-pointer">
             <span id="txt-tab-contacts">🚨 7. Contacts</span>
           </button>
-          <button id="tab-profile" onclick="switchTab('profile')" class="btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition border-2 border-purple-300 bg-purple-50 text-purple-900 hover:bg-purple-100 flex items-center justify-center gap-1.5">
+          <button id="tab-profile" onclick="switchTab('profile')" class="btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition border-2 border-purple-300 bg-purple-50 text-purple-900 hover:bg-purple-100 flex items-center justify-center gap-1.5 cursor-pointer">
             <span>👤 Profile & Users</span>
           </button>
         </div>
@@ -307,7 +307,7 @@
           </div>
           <p class="text-sm text-slate-500 mb-6">Each profile maintains strictly isolated records. Other users on this device cannot view your tasks, medicines, expenses, or health logs.</p>
 
-          <form onsubmit="handleSaveCurrentProfile(event)" class="space-y-4">
+          <div class="space-y-4">
             <div class="flex items-center gap-5 pb-4 border-b border-slate-100">
               <div id="profile-avatar-large" class="w-20 h-20 rounded-3xl bg-brand-600 text-white font-extrabold text-3xl flex items-center justify-center border-2 border-brand-700 overflow-hidden shadow">
                 <span id="profile-avatar-large-text">U</span>
@@ -315,24 +315,24 @@
               <div>
                 <label class="block text-sm font-bold text-slate-700 mb-1">Profile Photo</label>
                 <input type="file" id="profile-photo-input" accept="image/*" onchange="handleProfilePhotoUpload(event)" class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 cursor-pointer">
-                <button type="button" onclick="removeProfilePhoto()" class="text-xs text-red-600 font-semibold hover:underline mt-1">Remove photo</button>
+                <button type="button" onclick="removeProfilePhoto()" class="text-xs text-red-600 font-semibold hover:underline mt-1 cursor-pointer">Remove photo</button>
               </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label class="block font-medium text-slate-700 mb-1">Name *</label>
-                <input id="prof-name" type="text" placeholder="Full name" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-semibold" required>
+                <input id="prof-name" type="text" placeholder="Full name" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-semibold">
               </div>
               <div>
                 <label class="block font-medium text-slate-700 mb-1">Email Address (Optional)</label>
-                <input id="prof-email" type="email" placeholder="e.g. name@example.com (optional)" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50">
+                <input id="prof-email" type="text" placeholder="e.g. name@example.com (optional)" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50">
               </div>
             </div>
 
             <div>
               <label class="block font-medium text-slate-700 mb-1">Change Password (Leave blank to keep existing)</label>
-              <input id="prof-password" type="password" placeholder="Enter new password" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50">
+              <input id="prof-password" type="password" autocomplete="new-password" placeholder="Enter new password" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50">
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -355,10 +355,10 @@
               </div>
             </div>
 
-            <button type="submit" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg shadow">
+            <button type="button" onclick="handleSaveCurrentProfile()" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg shadow cursor-pointer">
               💾 Update My Profile
             </button>
-          </form>
+          </div>
         </div>
 
         <div class="bg-white p-5 sm:p-7 rounded-3xl shadow-sm border-2 border-slate-200 space-y-5">
@@ -367,7 +367,7 @@
               <h3 class="text-xl font-bold text-slate-900">Profiles on this Device</h3>
               <p class="text-xs sm:text-sm text-slate-500">Switch profile or register a new one</p>
             </div>
-            <button onclick="promptNewUserRegister()" class="btn-touch px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm shadow">
+            <button onclick="promptNewUserRegister()" class="btn-touch px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm shadow cursor-pointer">
               ➕ Register Another Profile
             </button>
           </div>
@@ -392,33 +392,37 @@
 
         <div class="bg-white p-5 sm:p-7 rounded-3xl shadow-sm border-2 border-slate-200">
           <h3 id="txt-add-task-heading" class="text-xl font-bold text-slate-900 mb-2">Schedule a Task or Appointment</h3>
-          <form onsubmit="handleAddTask(event)" class="space-y-4">
+          <div class="space-y-4">
             <div>
-              <label id="lbl-task-desc" class="block text-slate-700 font-medium mb-1">What needs to be done?</label>
+              <label id="lbl-task-desc" class="block text-slate-700 font-medium mb-1">What needs to be done? *</label>
               <div class="flex gap-2">
-                <input id="task-input" type="text" placeholder="e.g., Doctor appointment, Fasting blood test, Electrician arrival" class="input-touch flex-grow px-4 rounded-xl border-2 border-slate-300 focus:border-brand-600 focus:outline-none bg-slate-50 text-slate-900" required>
+                <input id="task-input" type="text" placeholder="e.g., Doctor appointment, Fasting blood test, Electrician arrival" class="input-touch flex-grow px-4 rounded-xl border-2 border-slate-300 focus:border-brand-600 focus:outline-none bg-slate-50 text-slate-900">
                 <button type="button" onclick="startDictation('task-input')" class="btn-touch px-4 rounded-xl bg-slate-100 border-2 border-slate-300 font-medium cursor-pointer">🎙️</button>
               </div>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label id="lbl-task-date" class="block text-slate-700 font-medium mb-1">Scheduled Date:</label>
-                <input id="task-date-input" type="date" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-medium" required>
+                <input id="task-date-input" type="date" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-medium">
               </div>
               <div>
                 <label id="lbl-task-time" class="block text-slate-700 font-medium mb-1">Scheduled Time (Optional):</label>
                 <input id="task-time-input" type="time" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-medium">
               </div>
             </div>
-            <!-- NEW: Repeat for whole week option -->
-            <div class="p-3 bg-brand-50 border border-brand-200 rounded-xl flex items-center gap-3">
-            <input type="checkbox" id="task-repeat-week" class="w-5 h-5 accent-brand-600 rounded cursor-pointer">
-            <label for="task-repeat-week" class="text-sm font-bold text-brand-900 cursor-pointer select-none">
-            🔁 Repeat daily for the entire upcoming 7 days
-             </label>
+
+            <!-- Single Option to Repeat Across Whole Week -->
+            <div class="p-3.5 bg-brand-50 border border-brand-200 rounded-2xl flex items-center gap-3">
+              <input type="checkbox" id="task-repeat-week" class="w-5 h-5 accent-brand-600 rounded cursor-pointer">
+              <label for="task-repeat-week" class="text-sm font-bold text-brand-900 cursor-pointer select-none">
+                🔁 Repeat daily for the entire upcoming 7 days
+              </label>
+            </div>
+
+            <button id="btn-add-task" type="button" onclick="handleAddTask()" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg shadow cursor-pointer">
+              ➕ Add to Schedule
+            </button>
           </div>
-            <button id="btn-add-task" type="submit" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg shadow cursor-pointer">➕ Add to Schedule</button>
-          </form>
         </div>
 
         <div class="bg-white p-5 sm:p-7 rounded-3xl shadow-sm border-2 border-slate-200">
@@ -445,15 +449,15 @@
 
         <div class="bg-white p-5 sm:p-7 rounded-3xl shadow-sm border-2 border-slate-200">
           <h2 id="txt-exp-add-heading" class="text-xl font-bold text-slate-900 mb-4">Record New Expense & Bill</h2>
-          <form onsubmit="handleSaveExpense(event)" class="space-y-4">
+          <div class="space-y-4">
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div class="sm:col-span-2">
-                <label id="lbl-exp-desc" class="block font-medium text-slate-700 mb-1">Expense Description</label>
-                <input id="exp-desc" type="text" placeholder="e.g. Apollo Pharmacy, Electricity Bill" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50" required>
+                <label id="lbl-exp-desc" class="block font-medium text-slate-700 mb-1">Expense Description *</label>
+                <input id="exp-desc" type="text" placeholder="e.g. Apollo Pharmacy, Electricity Bill" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50">
               </div>
               <div>
-                <label id="lbl-exp-amt" class="block font-medium text-slate-700 mb-1">Amount (₹ INR)</label>
-                <input id="exp-amount" type="number" step="0.01" placeholder="0.00" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-bold" required>
+                <label id="lbl-exp-amt" class="block font-medium text-slate-700 mb-1">Amount (₹ INR) *</label>
+                <input id="exp-amount" type="number" step="0.01" placeholder="0.00" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-bold">
               </div>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -470,15 +474,17 @@
               </div>
               <div>
                 <label id="lbl-exp-date" class="block font-medium text-slate-700 mb-1">Expense Date</label>
-                <input id="exp-date" type="date" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-medium" required>
+                <input id="exp-date" type="date" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-medium">
               </div>
             </div>
             <div class="p-4 bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl">
               <label id="lbl-exp-photo" class="block font-bold text-slate-800 mb-1">📷 Attach Bill / Receipt Screenshot (Optional)</label>
               <input id="exp-image-file" type="file" accept="image/*" onchange="previewSelectedImage(event)" class="mt-2 block w-full text-sm">
             </div>
-            <button id="btn-save-exp" type="submit" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg shadow cursor-pointer">+ Save Expense Entry</button>
-          </form>
+            <button id="btn-save-exp" type="button" onclick="handleSaveExpense()" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg shadow cursor-pointer">
+              + Save Expense Entry
+            </button>
+          </div>
         </div>
 
         <div class="bg-white p-5 sm:p-7 rounded-3xl shadow-sm border-2 border-slate-200 space-y-4">
@@ -539,11 +545,11 @@
         <div class="bg-white p-5 sm:p-7 rounded-3xl shadow-sm border-2 border-slate-200">
           <h2 id="txt-where-heading" class="text-xl font-bold text-slate-900 mb-2">🔍 Where Did I Keep It? (Misplaced Item Finder)</h2>
           <p id="txt-where-sub" class="text-sm text-slate-500 mb-4">Record where keys, passbooks, insurance cards, and documents are kept.</p>
-          <form onsubmit="handleSaveWhereItem(event)" class="space-y-4">
+          <div class="space-y-4">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label id="lbl-where-item" class="block font-medium text-slate-700 mb-1">Item or Document Name *</label>
-                <input id="where-item" type="text" placeholder="e.g. Car Spare Key, Health Insurance Cards, Passport" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50" required>
+                <input id="where-item" type="text" placeholder="e.g. Car Spare Key, Health Insurance Cards, Passport" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50">
               </div>
               <div>
                 <label id="lbl-where-room" class="block font-medium text-slate-700 mb-1">Room / Storage Area *</label>
@@ -559,10 +565,12 @@
             </div>
             <div>
               <label id="lbl-where-loc" class="block font-medium text-slate-700 mb-1">Exact Location / Shelf / Drawer Description *</label>
-              <textarea id="where-loc" rows="2" placeholder="e.g. Master bedroom wooden almirah, top right drawer inside the green pouch" class="w-full p-3 rounded-xl border-2 border-slate-300 bg-slate-50" required></textarea>
+              <textarea id="where-loc" rows="2" placeholder="e.g. Master bedroom wooden almirah, top right drawer inside the green pouch" class="w-full p-3 rounded-xl border-2 border-slate-300 bg-slate-50"></textarea>
             </div>
-            <button id="btn-save-where" type="submit" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg shadow cursor-pointer">📌 Save Item Location</button>
-          </form>
+            <button id="btn-save-where" type="button" onclick="handleSaveWhereItem()" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg shadow cursor-pointer">
+              📌 Save Item Location
+            </button>
+          </div>
         </div>
 
         <div class="bg-white p-5 sm:p-7 rounded-3xl shadow-sm border-2 border-slate-200 space-y-4">
@@ -577,15 +585,15 @@
         <div class="bg-white p-5 sm:p-7 rounded-3xl shadow-sm border-2 border-slate-200">
           <h2 id="txt-bills-heading" class="text-xl font-bold text-slate-900 mb-2">📅 Recurring Bills & Policy Renewals</h2>
           <p id="txt-bills-sub" class="text-sm text-slate-500 mb-4">Track electricity bills, LPG cylinders, health policy renewals, or broadband deadlines.</p>
-          <form onsubmit="handleSaveBill(event)" class="space-y-4">
+          <div class="space-y-4">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label id="lbl-bill-name" class="block font-medium text-slate-700 mb-1">Bill or Policy Name *</label>
-                <input id="bill-name" type="text" placeholder="e.g. Electricity Bill, Health Insurance, Gas Cylinder" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50" required>
+                <input id="bill-name" type="text" placeholder="e.g. Electricity Bill, Health Insurance, Gas Cylinder" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50">
               </div>
               <div>
                 <label id="lbl-bill-date" class="block font-medium text-slate-700 mb-1">Due Date *</label>
-                <input id="bill-due-date" type="date" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-medium" required>
+                <input id="bill-due-date" type="date" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-medium">
               </div>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -602,8 +610,10 @@
                 </select>
               </div>
             </div>
-            <button id="btn-save-bill" type="submit" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg shadow cursor-pointer">➕ Set Bill Reminder</button>
-          </form>
+            <button id="btn-save-bill" type="button" onclick="handleSaveBill()" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg shadow cursor-pointer">
+              ➕ Set Bill Reminder
+            </button>
+          </div>
         </div>
 
         <div class="bg-white p-5 sm:p-7 rounded-3xl shadow-sm border-2 border-slate-200">
@@ -617,7 +627,7 @@
         <div class="bg-white p-5 sm:p-7 rounded-3xl shadow-sm border-2 border-slate-200">
           <h2 id="txt-vitals-heading" class="text-xl font-bold text-slate-900 mb-2">🩺 Blood Pressure & Sugar Log</h2>
           <p id="txt-vitals-sub" class="text-sm text-slate-500 mb-4">Record readings to show your doctor during visits.</p>
-          <form onsubmit="handleSaveVital(event)" class="space-y-4">
+          <div class="space-y-4">
             <div class="grid grid-cols-3 gap-3">
               <div>
                 <label id="lbl-sys" class="block text-xs font-bold uppercase text-slate-600 mb-1">Systolic (High)</label>
@@ -646,8 +656,10 @@
                 </select>
               </div>
             </div>
-            <button id="btn-save-vital" type="submit" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg shadow cursor-pointer">📊 Save Health Reading</button>
-          </form>
+            <button id="btn-save-vital" type="button" onclick="handleSaveVital()" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg shadow cursor-pointer">
+              📊 Save Health Reading
+            </button>
+          </div>
         </div>
 
         <div class="bg-white p-5 sm:p-7 rounded-3xl shadow-sm border-2 border-slate-200">
@@ -685,15 +697,15 @@
 
         <div class="bg-white p-5 sm:p-7 rounded-3xl shadow-sm border-2 border-slate-200">
           <h3 id="txt-save-contact-heading" class="text-xl font-bold text-slate-900 mb-2">Save Important Contact</h3>
-          <form onsubmit="handleSaveContact(event)" class="space-y-4">
+          <div class="space-y-4">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label id="lbl-contact-name" class="block font-medium text-slate-700 mb-1">Name & Role *</label>
-                <input id="contact-name" type="text" placeholder="e.g. Dr. Ramesh (Physician), Apollo Chemist, Son Rahul" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50" required>
+                <input id="contact-name" type="text" placeholder="e.g. Dr. Ramesh (Physician), Apollo Chemist, Son Rahul" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50">
               </div>
               <div>
                 <label id="lbl-contact-phone" class="block font-medium text-slate-700 mb-1">Phone Number *</label>
-                <input id="contact-phone" type="tel" placeholder="e.g. 9876543210" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-bold" required>
+                <input id="contact-phone" type="tel" placeholder="e.g. 9876543210" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-bold">
               </div>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -712,8 +724,10 @@
                 <input id="contact-note" type="text" placeholder="e.g. Available 6 PM - 9 PM" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50">
               </div>
             </div>
-            <button id="btn-save-contact" type="submit" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg shadow cursor-pointer">💾 Save Contact</button>
-          </form>
+            <button id="btn-save-contact" type="button" onclick="handleSaveContact()" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg shadow cursor-pointer">
+              💾 Save Contact
+            </button>
+          </div>
         </div>
 
         <div class="bg-white p-5 sm:p-7 rounded-3xl shadow-sm border-2 border-slate-200">
@@ -736,15 +750,15 @@
         <h3 id="txt-med-modal-title" class="text-xl font-bold text-slate-900">Add Medicine Schedule</h3>
         <button onclick="closeAddMedicineModal()" class="text-xl font-bold p-2 cursor-pointer">✕</button>
       </div>
-      <form onsubmit="handleSaveMedicine(event)" class="space-y-4">
+      <div class="space-y-4">
         <div>
           <label id="lbl-med-name" class="block font-medium text-slate-700 mb-1">Medicine Name & Power *</label>
-          <input id="med-name" type="text" placeholder="e.g. Telma 40, Glycomet 500" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50" required>
+          <input id="med-name" type="text" placeholder="e.g. Telma 40, Glycomet 500" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50">
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label id="lbl-med-dosage" class="block font-medium text-slate-700 mb-1">Dosage *</label>
-            <input id="med-dosage" type="text" placeholder="e.g. 1 Tablet" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50" required>
+            <input id="med-dosage" type="text" placeholder="e.g. 1 Tablet" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50">
           </div>
           <div>
             <label id="lbl-med-food" class="block font-medium text-slate-700 mb-1">Food Rule *</label>
@@ -764,8 +778,10 @@
             <label class="p-3 border-2 rounded-xl flex items-center gap-2 cursor-pointer bg-indigo-50"><input id="slot-chk-night" type="checkbox" class="accent-indigo-600"> 🌙 Night</label>
           </div>
         </div>
-        <button id="btn-save-med-modal" type="submit" class="btn-touch w-full rounded-xl bg-brand-600 text-white font-bold text-lg shadow cursor-pointer">💾 Save Medicine</button>
-      </form>
+        <button id="btn-save-med-modal" type="button" onclick="handleSaveMedicine()" class="btn-touch w-full rounded-xl bg-brand-600 text-white font-bold text-lg shadow cursor-pointer">
+          💾 Save Medicine
+        </button>
+      </div>
     </div>
   </div>
 
@@ -1093,7 +1109,7 @@
         btnSaveVital: "📊 স্বাস্থ্য record সংরক্ষণ করুন",
         vitalsRecent: "সাম্প্রতিক রিপোর্ট",
         btnPrintVitals: "🖨️ ডাক্তারের জন্য প্রিন্ট",
-        helplinesHeading: "🚨 ২৪/৭ জরুরি হেল্পলাইন নম্বর",
+        helplinesHeading: "🚨 ২৪/୭ জরুরি হেল্পলাইন নম্বর",
         police: "পুলিশ / জরুরি সেবা",
         ambulance: "অ্যাম্বুলেন্স",
         fire: "দমকল বিভাগ",
@@ -1251,7 +1267,6 @@
     let isViewingAllSevenDays = false;
 
     window.addEventListener('DOMContentLoaded', async () => {
-      document.getElementById('current-date-text').textContent = new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
       document.getElementById('task-date-input').value = activeTodoDate;
       document.getElementById('exp-date').value = activeTodoDate;
       document.getElementById('bill-due-date').value = activeTodoDate;
@@ -1270,7 +1285,7 @@
         req.onupgradeneeded = (e) => {
           const d = e.target.result;
           ['profiles', 'todos', 'expenses', 'medicines', 'medLogs', 'whereItems', 'bills', 'vitals', 'contacts', 'water'].forEach(s => {
-            if (!d.objectStoreNames.contains(s)) d.createObjectStore(s, { keyPath: (s === 'water' ? 'id' : 'id') });
+            if (!d.objectStoreNames.contains(s)) d.createObjectStore(s, { keyPath: 'id' });
           });
         };
         req.onsuccess = () => { db = req.result; res(); };
@@ -1417,8 +1432,7 @@
       setLoginViewMode('password');
     }
 
-    function handleVerifyPassword(e) {
-      e.preventDefault();
+    function handleVerifyPassword() {
       const userId = document.getElementById('login-pwd-userid').value;
       const pwd = document.getElementById('login-pwd-input').value;
       const errEl = document.getElementById('login-pwd-error');
@@ -1481,22 +1495,24 @@
       reader.readAsDataURL(file);
     }
 
-    async function handleAuthRegister(e) {
-      if (e) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-
+    async function handleAuthRegister() {
       const name = (document.getElementById('login-name').value || '').trim();
       const email = (document.getElementById('login-email').value || '').trim();
-      const password = document.getElementById('login-password').value;
-      const confirmPassword = document.getElementById('login-confirm-password').value;
+      const password = (document.getElementById('login-password').value || '');
+      const confirmPassword = (document.getElementById('login-confirm-password').value || '');
       const lang = document.getElementById('login-lang').value || 'en';
       const size = document.getElementById('login-size').value || 'normal';
       const errEl = document.getElementById('reg-pwd-error');
 
       if (!name) {
         alert("Please enter your name");
+        document.getElementById('login-name').focus();
+        return;
+      }
+
+      if (!password) {
+        alert("Please create a password");
+        document.getElementById('login-password').focus();
         return;
       }
 
@@ -1642,8 +1658,7 @@
       });
     }
 
-    async function handleSaveCurrentProfile(e) {
-      e.preventDefault();
+    async function handleSaveCurrentProfile() {
       if (!currentProfile) return;
       currentProfile.name = document.getElementById('prof-name').value.trim();
       currentProfile.email = document.getElementById('prof-email').value.trim();
@@ -1721,6 +1736,7 @@
       if (!currentProfile) return;
       const pid = currentProfile.id;
 
+      // 1. Tasks LocalStorage + IndexedDB
       let localTodos = [];
       try {
         localTodos = JSON.parse(localStorage.getItem('daily_helper_todos_' + pid) || '[]');
@@ -1733,7 +1749,20 @@
       [...localTodos, ...dbUserTodos].forEach(item => { if (item && item.id) todoMap.set(item.id, item); });
       userTodos = Array.from(todoMap.values());
 
+      // 2. Expenses LocalStorage + IndexedDB
+      let localExp = [];
+      try {
+        localExp = JSON.parse(localStorage.getItem('daily_helper_exp_' + pid) || '[]');
+      } catch (err) {
+        localExp = [];
+      }
       const rawExpenses = await dbGetAll('expenses');
+      const dbUserExp = rawExpenses.filter(x => x.profileId === pid);
+      const expMap = new Map();
+      [...localExp, ...dbUserExp].forEach(item => { if (item && item.id) expMap.set(item.id, item); });
+      userExpenses = Array.from(expMap.values());
+
+      // 3. Other Modules
       const rawMeds = await dbGetAll('medicines');
       const rawMedLogs = await dbGetAll('medLogs');
       const rawWhere = await dbGetAll('whereItems');
@@ -1741,7 +1770,6 @@
       const rawVitals = await dbGetAll('vitals');
       const rawContacts = await dbGetAll('contacts');
 
-      userExpenses = rawExpenses.filter(x => x.profileId === pid);
       userMeds = rawMeds.filter(x => x.profileId === pid);
       userMedLogs = rawMedLogs.filter(x => x.profileId === pid);
       userWhere = rawWhere.filter(x => x.profileId === pid);
@@ -1766,15 +1794,15 @@
         if (t === target) {
           view.classList.remove('hidden');
           view.classList.add('block');
-          if (btn) btn.className = "btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition shadow border-2 border-brand-600 bg-brand-600 text-white flex items-center justify-center gap-1.5";
+          if (btn) btn.className = "btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition shadow border-2 border-brand-600 bg-brand-600 text-white flex items-center justify-center gap-1.5 cursor-pointer";
         } else {
           view.classList.add('hidden');
           view.classList.remove('block');
           if (btn) {
             if (t === 'profile') {
-              btn.className = "btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition border-2 border-purple-300 bg-purple-50 text-purple-900 hover:bg-purple-100 flex items-center justify-center gap-1.5";
+              btn.className = "btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition border-2 border-purple-300 bg-purple-50 text-purple-900 hover:bg-purple-100 flex items-center justify-center gap-1.5 cursor-pointer";
             } else {
-              btn.className = "btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition border-2 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5";
+              btn.className = "btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition border-2 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5 cursor-pointer";
             }
           }
         }
@@ -1838,7 +1866,7 @@
       }
     }
 
-    /* 7-DAY TASKS (Fail-Safe Storage) */
+    /* 7-DAY TASKS (Fail-Safe Storage & Single-Option Whole Week Generator) */
     function getNext7DaysRange() {
       const dates = [];
       for (let i = 0; i < 7; i++) {
@@ -1877,11 +1905,7 @@
       renderTodoList();
     }
 
-    async function handleAddTask(e) {
-      if (e) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
+    async function handleAddTask() {
       if (!currentProfile) {
         alert("Please sign in first.");
         return;
@@ -1891,86 +1915,55 @@
       const desc = (input.value || '').trim();
       const targetDate = document.getElementById('task-date-input').value;
       const scheduledTime = document.getElementById('task-time-input').value;
+      const repeatWeek = document.getElementById('task-repeat-week').checked;
 
       if (!desc) {
+        alert("Please enter what needs to be done.");
         input.focus();
         return;
       }
-      // 1. Determine target dates: either single date or the next 7 days
-  let datesToSchedule = [targetDate];
-  if (repeatWeek) {
-    datesToSchedule = [];
-    const baseDate = new Date(targetDate + 'T00:00:00');
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(baseDate);
-      d.setDate(baseDate.getDate() + i);
-      datesToSchedule.push(d.toISOString().slice(0, 10));
-    }
-  }
 
-  // 2. Generate task objects
-  const newTasks = datesToSchedule.map((dateStr, idx) => ({
-    id: Date.now() + idx,
-    profileId: currentProfile.id,
-    title: desc,
-    targetDate: dateStr,
-    scheduledTime: scheduledTime || null,
-    done: false
-  }));
+      let datesToSchedule = [targetDate];
+      if (repeatWeek) {
+        datesToSchedule = [];
+        const baseDate = new Date(targetDate + 'T00:00:00');
+        for (let i = 0; i < 7; i++) {
+          const d = new Date(baseDate);
+          d.setDate(baseDate.getDate() + i);
+          datesToSchedule.push(d.toISOString().slice(0, 10));
+        }
+      }
 
-  // 3. Save to LocalStorage fail-safe
-  let localTodos = [];
-  try {
-    localTodos = JSON.parse(localStorage.getItem('daily_helper_todos_' + currentProfile.id) || '[]');
-  } catch (err) {
-    localTodos = [];
-  }
-  localTodos.push(...newTasks);
-  localStorage.setItem('daily_helper_todos_' + currentProfile.id, JSON.stringify(localTodos));
-
-  // 4. Save to IndexedDB
-  for (const t of newTasks) {
-    try {
-      await dbPut('todos', t);
-    } catch (err) {
-      console.warn('DB async save error:', err);
-    }
-  }
-
-  // 5. Reset inputs
-  input.value = '';
-  document.getElementById('task-repeat-week').checked = false;
-  activeTodoDate = targetDate;
-  buildUpcoming7DaySelector();
-
-  await loadUserData();
-}
-
-      const newTask = {
-        id: Date.now(),
+      const newTasks = datesToSchedule.map((dateStr, idx) => ({
+        id: Date.now() + idx,
         profileId: currentProfile.id,
         title: desc,
-        targetDate: targetDate,
+        targetDate: dateStr,
         scheduledTime: scheduledTime || null,
         done: false
-      };
+      }));
 
+      // 1. LocalStorage fail-safe
       let localTodos = [];
       try {
         localTodos = JSON.parse(localStorage.getItem('daily_helper_todos_' + currentProfile.id) || '[]');
       } catch (err) {
         localTodos = [];
       }
-      localTodos.push(newTask);
+      localTodos.push(...newTasks);
       localStorage.setItem('daily_helper_todos_' + currentProfile.id, JSON.stringify(localTodos));
 
-      try {
-        await dbPut('todos', newTask);
-      } catch (err) {
-        console.warn('DB async save:', err);
+      // 2. Background IndexedDB
+      for (const t of newTasks) {
+        try {
+          await dbPut('todos', t);
+        } catch (err) {
+          console.warn('DB async save:', err);
+        }
       }
 
       input.value = '';
+      document.getElementById('task-repeat-week').checked = false;
       activeTodoDate = targetDate;
       buildUpcoming7DaySelector();
 
@@ -2083,7 +2076,7 @@
       filtered.forEach(t => renderTaskCard(t, c));
     }
 
-    /* EXPENSES (User-Scoped) */
+    /* EXPENSES (Fail-Safe LocalStorage + IndexedDB Fix) */
     function populateYearDropdown() {
       const s = document.getElementById('filter-year');
       s.innerHTML = '<option value="ALL">All Years</option>';
@@ -2113,25 +2106,80 @@
       r.readAsDataURL(file);
     }
 
-    async function handleSaveExpense(e) {
-      e.preventDefault();
-      if (!currentProfile) return;
-      const desc = document.getElementById('exp-desc').value.trim();
-      const amount = parseFloat(document.getElementById('exp-amount').value);
-      const category = document.getElementById('exp-category').value;
-      const date = document.getElementById('exp-date').value;
-      await dbPut('expenses', {
+    async function handleSaveExpense() {
+      if (!currentProfile) {
+        const activeId = localStorage.getItem('daily_helper_active_user');
+        if (activeId && allProfiles) {
+          currentProfile = allProfiles.find(p => p.id === activeId);
+        }
+      }
+      if (!currentProfile) {
+        alert("Please sign in to save expenses.");
+        return;
+      }
+
+      const descInput = document.getElementById('exp-desc');
+      const amtInput = document.getElementById('exp-amount');
+      const catInput = document.getElementById('exp-category');
+      const dateInput = document.getElementById('exp-date');
+
+      const desc = (descInput.value || '').trim();
+      const amount = parseFloat(amtInput.value);
+      const category = catInput.value;
+      const date = dateInput.value;
+
+      if (!desc || isNaN(amount) || amount <= 0) {
+        alert("Please enter a valid description and amount.");
+        return;
+      }
+
+      const newExpense = {
         id: Date.now(),
         profileId: currentProfile.id,
-        desc,
-        amount,
-        category,
-        date,
-        image: currentExpImage
-      });
-      document.getElementById('exp-desc').value = '';
-      document.getElementById('exp-amount').value = '';
+        desc: desc,
+        amount: amount,
+        category: category,
+        date: date,
+        image: currentExpImage || null
+      };
+
+      // 1. Instant LocalStorage backup (prevents silent data loss)
+      let localExp = [];
+      try {
+        localExp = JSON.parse(localStorage.getItem('daily_helper_exp_' + currentProfile.id) || '[]');
+      } catch (err) {
+        localExp = [];
+      }
+      localExp.unshift(newExpense);
+      localStorage.setItem('daily_helper_exp_' + currentProfile.id, JSON.stringify(localExp));
+
+      // 2. Background IndexedDB save
+      try {
+        await dbPut('expenses', newExpense);
+      } catch (err) {
+        console.warn('DB async save warning:', err);
+      }
+
+      // 3. Clear form inputs safely
+      descInput.value = '';
+      amtInput.value = '';
       currentExpImage = null;
+      const fileInput = document.getElementById('exp-image-file');
+      if (fileInput) fileInput.value = '';
+
+      await loadUserData();
+    }
+
+    async function deleteExpense(id) {
+      if (!currentProfile) return;
+      let localExp = [];
+      try {
+        localExp = JSON.parse(localStorage.getItem('daily_helper_exp_' + currentProfile.id) || '[]');
+      } catch (err) {}
+      localExp = localExp.filter(x => x.id !== id);
+      localStorage.setItem('daily_helper_exp_' + currentProfile.id, JSON.stringify(localExp));
+
+      await dbDelete('expenses', id);
       await loadUserData();
     }
 
@@ -2139,6 +2187,7 @@
 
     function renderExpenseList() {
       const c = document.getElementById('expense-list-container');
+      if (!c) return;
       c.innerHTML = '';
       const query = (document.getElementById('filter-keyword')?.value || '').toLowerCase();
       const yr = document.getElementById('filter-year')?.value || 'ALL';
@@ -2158,6 +2207,11 @@
       const filteredTotal = filtered.reduce((acc, curr) => acc + curr.amount, 0);
       document.getElementById('expense-filtered-total').textContent = filteredTotal.toFixed(2);
 
+      if (filtered.length === 0) {
+        c.innerHTML = '<p class="text-slate-400 text-center py-6">No expenses found for this filter.</p>';
+        return;
+      }
+
       filtered.forEach(x => {
         const div = document.createElement('div');
         div.className = "p-4 rounded-2xl bg-white border-2 border-slate-200 flex justify-between items-center";
@@ -2168,7 +2222,7 @@
           </div>
           <div class="flex items-center gap-3">
             <span class="font-extrabold text-slate-900 text-lg">₹${x.amount.toFixed(2)}</span>
-            <button onclick="dbDelete('expenses', ${x.id}).then(loadUserData)" class="text-red-600 font-bold cursor-pointer">🗑️</button>
+            <button onclick="deleteExpense(${x.id})" class="text-red-600 font-bold cursor-pointer">🗑️</button>
           </div>
         `;
         c.appendChild(div);
@@ -2194,8 +2248,7 @@
     function openAddMedicineModal() { document.getElementById('med-modal').classList.remove('hidden'); document.getElementById('med-modal').classList.add('flex'); }
     function closeAddMedicineModal() { document.getElementById('med-modal').classList.add('hidden'); document.getElementById('med-modal').classList.remove('flex'); }
 
-    async function handleSaveMedicine(e) {
-      e.preventDefault();
+    async function handleSaveMedicine() {
       if (!currentProfile) return;
       const name = document.getElementById('med-name').value.trim();
       const dosage = document.getElementById('med-dosage').value.trim();
@@ -2206,6 +2259,12 @@
         evening: document.getElementById('slot-chk-evening').checked,
         night: document.getElementById('slot-chk-night').checked
       };
+
+      if (!name) {
+        alert("Please enter the medicine name.");
+        return;
+      }
+
       await dbPut('medicines', {
         id: Date.now(),
         profileId: currentProfile.id,
@@ -2262,12 +2321,17 @@
     }
 
     /* WHERE DID I KEEP IT? (User-Scoped) */
-    async function handleSaveWhereItem(e) {
-      e.preventDefault();
+    async function handleSaveWhereItem() {
       if (!currentProfile) return;
       const item = document.getElementById('where-item').value.trim();
       const room = document.getElementById('where-room').value;
       const loc = document.getElementById('where-loc').value.trim();
+
+      if (!item || !loc) {
+        alert("Please enter the item name and exact location.");
+        return;
+      }
+
       await dbPut('whereItems', {
         id: Date.now(),
         profileId: currentProfile.id,
@@ -2302,13 +2366,18 @@
     }
 
     /* RECURRING BILLS (User-Scoped) */
-    async function handleSaveBill(e) {
-      e.preventDefault();
+    async function handleSaveBill() {
       if (!currentProfile) return;
       const name = document.getElementById('bill-name').value.trim();
       const dueDate = document.getElementById('bill-due-date').value;
       const amount = document.getElementById('bill-amount').value || '—';
       const freq = document.getElementById('bill-freq').value;
+
+      if (!name || !dueDate) {
+        alert("Please provide the bill name and due date.");
+        return;
+      }
+
       await dbPut('bills', {
         id: Date.now(),
         profileId: currentProfile.id,
@@ -2353,14 +2422,19 @@
     }
 
     /* HEALTH VITALS (User-Scoped) */
-    async function handleSaveVital(e) {
-      e.preventDefault();
+    async function handleSaveVital() {
       if (!currentProfile) return;
       const sys = document.getElementById('vital-sys').value;
       const dia = document.getElementById('vital-dia').value;
       const pulse = document.getElementById('vital-pulse').value;
       const sugar = document.getElementById('vital-sugar').value;
       const sugarType = document.getElementById('vital-sugar-type').value;
+
+      if (!sys && !sugar) {
+        alert("Please enter either BP or Sugar readings.");
+        return;
+      }
+
       await dbPut('vitals', {
         id: Date.now(),
         profileId: currentProfile.id,
@@ -2394,13 +2468,18 @@
     }
 
     /* CONTACTS (User-Scoped) */
-    async function handleSaveContact(e) {
-      e.preventDefault();
+    async function handleSaveContact() {
       if (!currentProfile) return;
       const name = document.getElementById('contact-name').value.trim();
       const phone = document.getElementById('contact-phone').value.trim();
       const category = document.getElementById('contact-category').value;
       const note = document.getElementById('contact-note').value.trim();
+
+      if (!name || !phone) {
+        alert("Please enter both contact name and phone number.");
+        return;
+      }
+
       await dbPut('contacts', {
         id: Date.now(),
         profileId: currentProfile.id,
