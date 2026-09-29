@@ -410,6 +410,13 @@
                 <input id="task-time-input" type="time" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-medium">
               </div>
             </div>
+            <!-- NEW: Repeat for whole week option -->
+            <div class="p-3 bg-brand-50 border border-brand-200 rounded-xl flex items-center gap-3">
+            <input type="checkbox" id="task-repeat-week" class="w-5 h-5 accent-brand-600 rounded cursor-pointer">
+            <label for="task-repeat-week" class="text-sm font-bold text-brand-900 cursor-pointer select-none">
+            🔁 Repeat daily for the entire upcoming 7 days
+             </label>
+          </div>
             <button id="btn-add-task" type="submit" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg shadow cursor-pointer">➕ Add to Schedule</button>
           </form>
         </div>
@@ -1889,6 +1896,55 @@
         input.focus();
         return;
       }
+      // 1. Determine target dates: either single date or the next 7 days
+  let datesToSchedule = [targetDate];
+  if (repeatWeek) {
+    datesToSchedule = [];
+    const baseDate = new Date(targetDate + 'T00:00:00');
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(baseDate);
+      d.setDate(baseDate.getDate() + i);
+      datesToSchedule.push(d.toISOString().slice(0, 10));
+    }
+  }
+
+  // 2. Generate task objects
+  const newTasks = datesToSchedule.map((dateStr, idx) => ({
+    id: Date.now() + idx,
+    profileId: currentProfile.id,
+    title: desc,
+    targetDate: dateStr,
+    scheduledTime: scheduledTime || null,
+    done: false
+  }));
+
+  // 3. Save to LocalStorage fail-safe
+  let localTodos = [];
+  try {
+    localTodos = JSON.parse(localStorage.getItem('daily_helper_todos_' + currentProfile.id) || '[]');
+  } catch (err) {
+    localTodos = [];
+  }
+  localTodos.push(...newTasks);
+  localStorage.setItem('daily_helper_todos_' + currentProfile.id, JSON.stringify(localTodos));
+
+  // 4. Save to IndexedDB
+  for (const t of newTasks) {
+    try {
+      await dbPut('todos', t);
+    } catch (err) {
+      console.warn('DB async save error:', err);
+    }
+  }
+
+  // 5. Reset inputs
+  input.value = '';
+  document.getElementById('task-repeat-week').checked = false;
+  activeTodoDate = targetDate;
+  buildUpcoming7DaySelector();
+
+  await loadUserData();
+}
 
       const newTask = {
         id: Date.now(),
