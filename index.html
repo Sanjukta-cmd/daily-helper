@@ -1,0 +1,2418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Helper - Multi-Profile Life Companion</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#0284c7',
+              600: '#0369a1',
+              700: '#075985',
+              800: '#0c4a6e',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800&family=Noto+Sans+Oriya:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Lexend', 'Noto Sans Oriya', 'Noto Sans Devanagari', 'Noto Sans Bengali', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body.font-normal { font-size: 18px; }
+    body.font-large { font-size: 21px; }
+    body.font-xlarge { font-size: 24px; }
+    .btn-touch {
+      min-height: 52px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .input-touch {
+      min-height: 52px;
+      font-size: 1.05em;
+    }
+    input[type="checkbox"] {
+      width: 26px;
+      height: 26px;
+      cursor: pointer;
+    }
+    .fade-enter {
+      animation: fadeIn 0.2s ease-in-out forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="font-normal antialiased min-h-screen flex flex-col justify-between">
+
+  <!-- ========================================== -->
+  <!-- 1. FULL-SCREEN DEDICATED AUTH GATEWAY      -->
+  <!-- ========================================== -->
+  <section id="screen-login" class="min-h-screen flex flex-col items-center justify-center p-4 bg-slate-900 text-slate-100">
+    <div class="max-w-md w-full bg-white text-slate-900 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 border border-slate-100">
+      
+      <div class="text-center space-y-2">
+        <div class="w-16 h-16 rounded-2xl bg-brand-600 text-white text-3xl font-extrabold flex items-center justify-center mx-auto shadow-md">
+          🛡️
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Daily Helper</h1>
+        <p class="text-xs sm:text-sm text-slate-500 font-medium">Please sign in or register to access your private data</p>
+      </div>
+
+      <!-- Select Existing User Profiles List -->
+      <div id="login-existing-box" class="space-y-3 hidden">
+        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500">Select Profile to Sign In:</label>
+        <div id="login-existing-user-list" class="space-y-2.5 max-h-56 overflow-y-auto pr-1"></div>
+        <div class="pt-2 text-center border-t border-slate-100">
+          <button type="button" onclick="setLoginViewMode('register')" class="text-sm font-bold text-brand-700 hover:underline">
+            ➕ Register New Personal Profile
+          </button>
+        </div>
+      </div>
+
+      <!-- Password Prompt for Existing Users -->
+      <div id="login-password-box" class="space-y-4 hidden">
+        <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-200">
+          <div id="login-pwd-avatar" class="w-12 h-12 rounded-xl bg-brand-600 text-white font-extrabold flex items-center justify-center overflow-hidden flex-shrink-0"></div>
+          <div>
+            <h3 id="login-pwd-username" class="font-bold text-slate-900 text-base leading-tight"></h3>
+            <p id="login-pwd-useremail" class="text-xs text-slate-500"></p>
+          </div>
+        </div>
+
+        <form onsubmit="handleVerifyPassword(event)" class="space-y-4">
+          <input type="hidden" id="login-pwd-userid">
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Enter Password *</label>
+            <input id="login-pwd-input" type="password" placeholder="Enter your password" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-semibold text-slate-900" required>
+            <p id="login-pwd-error" class="text-xs text-red-600 font-bold mt-1.5 hidden"></p>
+          </div>
+
+          <button type="submit" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-base sm:text-lg shadow-md transition active:scale-95">
+            🔓 Unlock Profile
+          </button>
+
+          <div class="text-center pt-1">
+            <button type="button" onclick="setLoginViewMode('select')" class="text-xs font-bold text-slate-500 hover:underline">
+              ← Switch to Another Profile
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Registration Form -->
+      <form id="login-register-form" onsubmit="handleAuthRegister(event)" class="space-y-4">
+        <div class="flex items-center justify-between border-b pb-2">
+          <h2 class="font-bold text-slate-900 text-base">Create Personal Profile</h2>
+          <span class="text-xs bg-brand-50 text-brand-700 px-2.5 py-0.5 rounded-full font-bold">New User</span>
+        </div>
+
+        <!-- Optional Profile Photo -->
+        <div class="flex items-center gap-3 pt-1">
+          <div id="login-avatar-preview" class="w-14 h-14 rounded-2xl bg-brand-100 text-brand-800 font-extrabold text-xl flex items-center justify-center border-2 border-brand-300 overflow-hidden flex-shrink-0 shadow-inner">
+            <span>📷</span>
+          </div>
+          <div class="flex-grow">
+            <label class="block text-xs font-bold text-slate-700 mb-1">Optional Profile Photo</label>
+            <input type="file" id="login-photo-input" accept="image/*" onchange="handleLoginPhotoUpload(event)" class="block w-full text-xs text-slate-500 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 cursor-pointer">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-1">Full Name *</label>
+          <input id="login-name" type="text" placeholder="e.g. Ramesh Sahoo" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-semibold text-slate-900" required>
+        </div>
+
+        <div>
+          <label class="block text-sm font-bold text-slate-700 mb-1">Email Address (Optional)</label>
+          <input id="login-email" type="text" placeholder="e.g. name@example.com (optional)" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 text-slate-900">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Password *</label>
+            <input id="login-password" type="password" placeholder="Create a password" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 text-slate-900" required>
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-slate-700 mb-1">Confirm Password *</label>
+            <input id="login-confirm-password" type="password" placeholder="Re-enter password" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 text-slate-900" required>
+          </div>
+        </div>
+        <p id="reg-pwd-error" class="text-xs text-red-600 font-bold hidden"></p>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Preferred Language</label>
+            <select id="login-lang" class="input-touch w-full px-3 rounded-xl border-2 border-slate-300 bg-slate-50 font-medium text-sm text-slate-900">
+              <option value="en">English</option>
+              <option value="or">ଓଡ଼ିଆ (Odia)</option>
+              <option value="hi">हिन्दी (Hindi)</option>
+              <option value="bn">বাংলা (Bengali)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Text Size</label>
+            <select id="login-size" class="input-touch w-full px-3 rounded-xl border-2 border-slate-300 bg-slate-50 font-medium text-sm text-slate-900">
+              <option value="normal">Normal</option>
+              <option value="large">Large (A+)</option>
+              <option value="xlarge">Extra Large (A++)</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-base sm:text-lg shadow-md transition active:scale-95">
+          💾 Create & Enter Application
+        </button>
+
+        <div id="login-cancel-reg-box" class="text-center pt-1 hidden">
+          <button type="button" onclick="setLoginViewMode('select')" class="text-xs font-bold text-slate-500 hover:underline">
+            ← Back to Saved Profiles
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- 2. MAIN APPLICATION (SECURED ACCESS)       -->
+  <!-- ========================================== -->
+  <div id="screen-app" class="hidden flex-col min-h-screen justify-between">
+    <!-- TOP HEADER -->
+    <header class="bg-white border-b-2 border-slate-200 sticky top-0 z-30 shadow-sm">
+      <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <button onclick="switchTab('profile')" class="flex items-center gap-2.5 p-1 rounded-2xl hover:bg-slate-100 transition" title="Manage Profile">
+            <div id="header-avatar-box" class="w-11 h-11 rounded-full bg-brand-600 text-white font-black text-lg flex items-center justify-center border-2 border-brand-700 overflow-hidden">
+              <span id="header-avatar-initials">U</span>
+            </div>
+            <div class="text-left">
+              <h1 id="txt-app-title" class="text-base sm:text-lg font-bold text-slate-900 leading-tight">Daily Helper</h1>
+              <p id="header-user-name" class="text-xs text-brand-700 font-bold">User</p>
+            </div>
+          </button>
+        </div>
+
+        <!-- Controls: Profile Switcher, Language, Font, Sign Out, Backup -->
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <select id="profile-quick-select" onchange="handleQuickSwitchUser(this.value)" class="px-2.5 py-1.5 rounded-xl font-bold text-xs sm:text-sm bg-slate-100 text-slate-800 border border-slate-300">
+          </select>
+
+          <select id="lang-select" onchange="changeLanguage(this.value)" class="px-2 py-1.5 rounded-xl font-bold text-xs sm:text-sm bg-slate-100 text-slate-800 border border-slate-300">
+            <option value="en">English</option>
+            <option value="or">ଓଡ଼ିଆ (Odia)</option>
+            <option value="hi">हिन्दी (Hindi)</option>
+            <option value="bn">বাংলা (Bengali)</option>
+          </select>
+
+          <div class="flex items-center gap-0.5 bg-slate-100 p-1 rounded-xl border border-slate-300">
+            <button onclick="setFontSize('normal')" class="px-2 py-0.5 rounded font-bold text-xs bg-white text-brand-700 shadow">A</button>
+            <button onclick="setFontSize('large')" class="px-2 py-0.5 rounded font-bold text-xs text-slate-600">A+</button>
+            <button onclick="setFontSize('xlarge')" class="px-2 py-0.5 rounded font-bold text-xs text-slate-600">A++</button>
+          </div>
+
+          <button onclick="signOutProfile()" class="px-2.5 py-1.5 rounded-xl font-bold text-xs bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 shadow-sm" title="Log Out & Lock Screen">
+            🚪 Sign Out
+          </button>
+
+          <button onclick="downloadDatabaseBackup()" class="px-2.5 py-1.5 rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-700 text-white shadow">💾 Backup</button>
+        </div>
+      </div>
+
+      <!-- STICKY DAILY HYDRATION TRACKER BAR -->
+      <div class="bg-sky-50 border-t border-b border-sky-200 px-4 py-2">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-xl">💧</span>
+            <span id="txt-water-title" class="text-sm sm:text-base font-bold text-sky-950">Daily Hydration:</span>
+            <span id="water-count-display" class="font-extrabold text-sky-800 bg-white border border-sky-300 px-3 py-0.5 rounded-full text-sm">0 / 8 Glasses</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="btn-water-less" onclick="logWater(-1)" class="btn-touch px-3 bg-white border border-sky-300 hover:bg-sky-100 rounded-xl font-bold text-sm">➖ Less</button>
+            <button id="btn-water-add" onclick="logWater(1)" class="btn-touch px-4 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-bold text-sm shadow">🥛 Add Glass</button>
+            <button onclick="resetWater()" class="btn-touch px-2.5 bg-slate-100 border border-slate-300 hover:bg-slate-200 rounded-xl font-bold text-xs text-slate-600" title="Reset Today">↺</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN DASHBOARD CONTENT -->
+    <main class="max-w-6xl w-full mx-auto px-4 py-5 flex-grow">
+
+      <!-- 2-ROW NAVIGATION BAR -->
+      <nav class="space-y-2 mb-6" aria-label="Main Sections">
+        <!-- Row 1 -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <button id="tab-todos" onclick="switchTab('todos')" class="btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition shadow border-2 border-brand-600 bg-brand-600 text-white flex items-center justify-center gap-1.5">
+            <span id="txt-tab-todos">🗓️ 1. 7-Day To-Do</span>
+          </button>
+          <button id="tab-expenses" onclick="switchTab('expenses')" class="btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition border-2 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5">
+            <span id="txt-tab-expenses">💰 2. Expenses</span>
+          </button>
+          <button id="tab-meds" onclick="switchTab('meds')" class="btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition border-2 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5">
+            <span id="txt-tab-meds">💊 3. Medicines</span>
+          </button>
+          <button id="tab-where" onclick="switchTab('where')" class="btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition border-2 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5">
+            <span id="txt-tab-where">🔍 4. Find Item</span>
+          </button>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <button id="tab-bills" onclick="switchTab('bills')" class="btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition border-2 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5">
+            <span id="txt-tab-bills">📅 5. Recurring Bills</span>
+          </button>
+          <button id="tab-vitals" onclick="switchTab('vitals')" class="btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition border-2 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5">
+            <span id="txt-tab-vitals">🩺 6. Health Vitals</span>
+          </button>
+          <button id="tab-contacts" onclick="switchTab('contacts')" class="btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition border-2 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5">
+            <span id="txt-tab-contacts">🚨 7. Contacts</span>
+          </button>
+          <button id="tab-profile" onclick="switchTab('profile')" class="btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition border-2 border-purple-300 bg-purple-50 text-purple-900 hover:bg-purple-100 flex items-center justify-center gap-1.5">
+            <span>👤 Profile & Users</span>
+          </button>
+        </div>
+      </nav>
+
+      <!-- TAB: PERSONAL PROFILE & MULTI-USER ISOLATION -->
+      <section id="view-profile" class="fade-enter hidden space-y-6">
+        <div class="bg-white p-5 sm:p-7 rounded-3xl shadow-sm border-2 border-slate-200">
+          <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-900 flex items-center gap-2">
+              <span>👤 Personal Profile Settings</span>
+            </h2>
+            <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-3 py-1 rounded-full border border-emerald-300">
+              Active User Session
+            </span>
+          </div>
+          <p class="text-sm text-slate-500 mb-6">Each profile maintains strictly isolated records. Other users on this device cannot view your tasks, medicines, expenses, or health logs.</p>
+
+          <form onsubmit="handleSaveCurrentProfile(event)" class="space-y-4">
+            <div class="flex items-center gap-5 pb-4 border-b border-slate-100">
+              <div id="profile-avatar-large" class="w-20 h-20 rounded-3xl bg-brand-600 text-white font-extrabold text-3xl flex items-center justify-center border-2 border-brand-700 overflow-hidden shadow">
+                <span id="profile-avatar-large-text">U</span>
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-slate-700 mb-1">Profile Photo</label>
+                <input type="file" id="profile-photo-input" accept="image/*" onchange="handleProfilePhotoUpload(event)" class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 cursor-pointer">
+                <button type="button" onclick="removeProfilePhoto()" class="text-xs text-red-600 font-semibold hover:underline mt-1">Remove photo</button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block font-medium text-slate-700 mb-1">Name *</label>
+                <input id="prof-name" type="text" placeholder="Full name" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-semibold" required>
+              </div>
+              <div>
+                <label class="block font-medium text-slate-700 mb-1">Email Address (Optional)</label>
+                <input id="prof-email" type="email" placeholder="e.g. name@example.com (optional)" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50">
+              </div>
+            </div>
+
+            <div>
+              <label class="block font-medium text-slate-700 mb-1">Change Password (Leave blank to keep existing)</label>
+              <input id="prof-password" type="password" placeholder="Enter new password" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block font-medium text-slate-700 mb-1">Preferred Language</label>
+                <select id="prof-lang" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-medium">
+                  <option value="en">English</option>
+                  <option value="or">ଓଡ଼ିଆ (Odia)</option>
+                  <option value="hi">हिन्दी (Hindi)</option>
+                  <option value="bn">বাংলা (Bengali)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-medium text-slate-700 mb-1">Text Size Preference</label>
+                <select id="prof-text-size" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-medium">
+                  <option value="normal">Standard (Normal)</option>
+                  <option value="large">Large (A+)</option>
+                  <option value="xlarge">Extra Large (A++)</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg shadow">
+              💾 Update My Profile
+            </button>
+          </form>
+        </div>
+
+        <div class="bg-white p-5 sm:p-7 rounded-3xl shadow-sm border-2 border-slate-200 space-y-5">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <h3 class="text-xl font-bold text-slate-900">Profiles on this Device</h3>
+              <p class="text-xs sm:text-sm text-slate-500">Switch profile or register a new one</p>
+            </div>
+            <button onclick="promptNewUserRegister()" class="btn-touch px-4 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm shadow">
+              ➕ Register Another Profile
+            </button>
+          </div>
+
+          <div id="profile-cards-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2"></div>
+        </div>
+      </section>
+
+      <!-- TAB 1: 7-DAY TO-DO PLANNER -->
+      <section id="view-todos" class="fade-enter block space-y-5">
+        <div class="bg-white p-4 sm:p-5 rounded-3xl shadow-sm border-2 border-slate-200">
+          <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+            <h2 id="txt-todos-heading" class="text-lg sm:text-xl font-bold text-slate-900">🗓️ Tasks for Upcoming 7 Days</h2>
+            <span id="selected-day-badge" class="text-xs sm:text-sm font-bold bg-brand-50 text-brand-700 border border-brand-200 px-3 py-1 rounded-full">Today</span>
+          </div>
+          <div id="upcoming-seven-days-strip" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-2 pt-1"></div>
+          <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-sm text-slate-600 gap-3">
+            <span id="seven-day-plan-metrics" class="bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg font-semibold border border-slate-200">0 Planned</span>
+            <button id="txt-view-all-todos" type="button" onclick="viewAllUpcomingSevenDays()" class="text-brand-600 hover:text-brand-800 font-bold underline cursor-pointer">📋 View Entire 7-Day Plan</button>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 sm:p-7 rounded-3xl shadow-sm border-2 border-slate-200">
+          <h3 id="txt-add-task-heading" class="text-xl font-bold text-slate-900 mb-2">Schedule a Task or Appointment</h3>
+          <form onsubmit="handleAddTask(event)" class="space-y-4">
+            <div>
+              <label id="lbl-task-desc" class="block text-slate-700 font-medium mb-1">What needs to be done?</label>
+              <div class="flex gap-2">
+                <input id="task-input" type="text" placeholder="e.g., Doctor appointment, Fasting blood test, Electrician arrival" class="input-touch flex-grow px-4 rounded-xl border-2 border-slate-300 focus:border-brand-600 focus:outline-none bg-slate-50 text-slate-900" required>
+                <button type="button" onclick="startDictation('task-input')" class="btn-touch px-4 rounded-xl bg-slate-100 border-2 border-slate-300 font-medium cursor-pointer">🎙️</button>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label id="lbl-task-date" class="block text-slate-700 font-medium mb-1">Scheduled Date:</label>
+                <input id="task-date-input" type="date" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-medium" required>
+              </div>
+              <div>
+                <label id="lbl-task-time" class="block text-slate-700 font-medium mb-1">Scheduled Time (Optional):</label>
+                <input id="task-time-input" type="time" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-medium">
+              </div>
+            </div>
+            <button id="btn-add-task" type="submit" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg shadow cursor-pointer">➕ Add to Schedule</button>
+          </form>
+        </div>
+
+        <div class="bg-white p-5 sm:p-7 rounded-3xl shadow-sm border-2 border-slate-200">
+          <div class="flex items-center justify-between mb-4">
+            <h3 id="todo-list-title" class="text-xl font-bold text-slate-900">Tasks for Selected Day</h3>
+            <span id="task-counter" class="text-sm font-semibold bg-blue-50 text-brand-700 border border-blue-200 px-3 py-1.5 rounded-full">0 Done</span>
+          </div>
+          <div id="todo-list" class="space-y-3"></div>
+        </div>
+      </section>
+
+      <!-- TAB 2: EXPENSES & 5-YEAR SEARCH -->
+      <section id="view-expenses" class="fade-enter hidden space-y-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="bg-gradient-to-br from-brand-700 to-brand-800 text-white p-6 rounded-3xl shadow-sm">
+            <p id="txt-exp-today-label" class="text-blue-100 text-base font-semibold">Today's Total Spending</p>
+            <div class="text-4xl font-extrabold mt-1">₹<span id="expense-today-total">0.00</span></div>
+          </div>
+          <div class="bg-emerald-800 text-white p-6 rounded-3xl shadow-sm">
+            <p id="txt-exp-filtered-label" class="text-emerald-100 text-base font-semibold">Filtered Search Total</p>
+            <div class="text-4xl font-extrabold mt-1">₹<span id="expense-filtered-total">0.00</span></div>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 sm:p-7 rounded-3xl shadow-sm border-2 border-slate-200">
+          <h2 id="txt-exp-add-heading" class="text-xl font-bold text-slate-900 mb-4">Record New Expense & Bill</h2>
+          <form onsubmit="handleSaveExpense(event)" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div class="sm:col-span-2">
+                <label id="lbl-exp-desc" class="block font-medium text-slate-700 mb-1">Expense Description</label>
+                <input id="exp-desc" type="text" placeholder="e.g. Apollo Pharmacy, Electricity Bill" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50" required>
+              </div>
+              <div>
+                <label id="lbl-exp-amt" class="block font-medium text-slate-700 mb-1">Amount (₹ INR)</label>
+                <input id="exp-amount" type="number" step="0.01" placeholder="0.00" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-bold" required>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label id="lbl-exp-cat" class="block font-medium text-slate-700 mb-1">Category</label>
+                <select id="exp-category" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-medium">
+                  <option value="Groceries & Food">🥦 Groceries & Food</option>
+                  <option value="Medicines & Hospital">💊 Medicines & Health</option>
+                  <option value="Bills & Utilities">💡 Bills & Utilities</option>
+                  <option value="Household & Repairs">🏡 Household & Repairs</option>
+                  <option value="Travel & Fuel">🚕 Travel & Fuel</option>
+                  <option value="Other">📝 Other</option>
+                </select>
+              </div>
+              <div>
+                <label id="lbl-exp-date" class="block font-medium text-slate-700 mb-1">Expense Date</label>
+                <input id="exp-date" type="date" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-medium" required>
+              </div>
+            </div>
+            <div class="p-4 bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl">
+              <label id="lbl-exp-photo" class="block font-bold text-slate-800 mb-1">📷 Attach Bill / Receipt Screenshot (Optional)</label>
+              <input id="exp-image-file" type="file" accept="image/*" onchange="previewSelectedImage(event)" class="mt-2 block w-full text-sm">
+            </div>
+            <button id="btn-save-exp" type="submit" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg shadow cursor-pointer">+ Save Expense Entry</button>
+          </form>
+        </div>
+
+        <div class="bg-white p-5 sm:p-7 rounded-3xl shadow-sm border-2 border-slate-200 space-y-4">
+          <h3 id="txt-exp-search-heading" class="text-xl font-bold text-slate-900">5-Year Bill & Expense Search</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <input id="filter-keyword" type="text" placeholder="🔍 Search description..." oninput="applyExpenseFilters()" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50">
+            <select id="filter-year" onchange="applyExpenseFilters()" class="input-touch w-full px-3 rounded-xl border-2 border-slate-300 bg-slate-50"></select>
+            <select id="filter-category" onchange="applyExpenseFilters()" class="input-touch w-full px-3 rounded-xl border-2 border-slate-300 bg-slate-50">
+              <option value="ALL">All Categories</option>
+              <option value="Groceries & Food">🥦 Groceries & Food</option>
+              <option value="Medicines & Hospital">💊 Medicines & Health</option>
+              <option value="Bills & Utilities">💡 Bills & Utilities</option>
+              <option value="Household & Repairs">🏡 Household & Repairs</option>
+            </select>
+          </div>
+          <div id="expense-list-container" class="space-y-3"></div>
+        </div>
+      </section>
+
+      <!-- TAB 3: 7-DAY MEDICINES -->
+      <section id="view-meds" class="fade-enter hidden space-y-6">
+        <div class="bg-white p-4 sm:p-5 rounded-3xl shadow-sm border-2 border-slate-200">
+          <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+            <h2 id="txt-med-header" class="text-lg sm:text-xl font-bold text-slate-900">💊 7-Day Medicine Planner (Today + Next 6 Days)[cite: 3]</h2>
+            <div class="flex items-center gap-2">
+              <span id="med-selected-day-badge" class="text-xs sm:text-sm font-bold bg-brand-50 text-brand-700 border border-brand-200 px-3 py-1 rounded-full">Today</span>
+              <button id="btn-add-med-modal" onclick="openAddMedicineModal()" class="btn-touch px-4 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm cursor-pointer">➕ Add Medicine[cite: 3]</button>
+            </div>
+          </div>
+          <div id="med-upcoming-seven-days-strip" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-2 pt-1"></div>
+          <div class="grid grid-cols-3 gap-3 mt-4 pt-3 border-t border-slate-100 text-center">
+            <div class="bg-blue-50 border border-blue-200 p-3 rounded-2xl"><p id="lbl-med-total" class="text-xs font-bold text-blue-700">Doses on this Day[cite: 3]</p><p id="med-stat-total" class="text-2xl font-extrabold text-blue-900 mt-1">0</p></div>
+            <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-2xl"><p id="lbl-med-taken" class="text-xs font-bold text-emerald-700">Taken ✅[cite: 3]</p><p id="med-stat-taken" class="text-2xl font-extrabold text-emerald-900 mt-1">0</p></div>
+            <div class="bg-amber-50 border border-amber-200 p-3 rounded-2xl"><p id="lbl-med-pending" class="text-xs font-bold text-amber-700">Pending ⏳[cite: 3]</p><p id="med-stat-pending" class="text-2xl font-extrabold text-amber-900 mt-1">0</p></div>
+          </div>
+        </div>
+
+        <div class="bg-amber-50/70 border-2 border-amber-200 rounded-3xl p-4 sm:p-5">
+          <h3 id="txt-slot-morning" class="font-bold text-amber-950 text-lg mb-2">☀️ Morning (Breakfast)</h3>
+          <div id="slot-list-morning" class="space-y-3"></div>
+        </div>
+        <div class="bg-orange-50/70 border-2 border-orange-200 rounded-3xl p-4 sm:p-5">
+          <h3 id="txt-slot-afternoon" class="font-bold text-orange-950 text-lg mb-2">🌤️ Afternoon (Lunch)</h3>
+          <div id="slot-list-afternoon" class="space-y-3"></div>
+        </div>
+        <div class="bg-purple-50/70 border-2 border-purple-200 rounded-3xl p-4 sm:p-5">
+          <h3 id="txt-slot-evening" class="font-bold text-purple-950 text-lg mb-2">🌇 Evening (Tea)</h3>
+          <div id="slot-list-evening" class="space-y-3"></div>
+        </div>
+        <div class="bg-indigo-50/70 border-2 border-indigo-200 rounded-3xl p-4 sm:p-5">
+          <h3 id="txt-slot-night" class="font-bold text-indigo-950 text-lg mb-2">🌙 Night (Dinner/Bedtime)</h3>
+          <div id="slot-list-night" class="space-y-3"></div>
+        </div>
+      </section>
+
+      <!-- TAB 4: WHERE DID I KEEP IT? -->
+      <section id="view-where" class="fade-enter hidden space-y-5">
+        <div class="bg-white p-5 sm:p-7 rounded-3xl shadow-sm border-2 border-slate-200">
+          <h2 id="txt-where-heading" class="text-xl font-bold text-slate-900 mb-2">🔍 Where Did I Keep It? (Misplaced Item Finder)</h2>
+          <p id="txt-where-sub" class="text-sm text-slate-500 mb-4">Record where keys, passbooks, insurance cards, and documents are kept.</p>
+          <form onsubmit="handleSaveWhereItem(event)" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label id="lbl-where-item" class="block font-medium text-slate-700 mb-1">Item or Document Name *</label>
+                <input id="where-item" type="text" placeholder="e.g. Car Spare Key, Health Insurance Cards, Passport" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50" required>
+              </div>
+              <div>
+                <label id="lbl-where-room" class="block font-medium text-slate-700 mb-1">Room / Storage Area *</label>
+                <select id="where-room" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-medium">
+                  <option value="Almirah & Safe Locker">🔐 Almirah & Safe Locker</option>
+                  <option value="Master Bedroom">🛏️ Master Bedroom</option>
+                  <option value="Living Room & TV Unit">🛋️ Living Room & TV Unit</option>
+                  <option value="Kitchen & Pantry">🍳 Kitchen & Pantry</option>
+                  <option value="Study Desk & Bookshelf">📚 Study Desk & Bookshelf</option>
+                  <option value="Other">📦 Other Place</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label id="lbl-where-loc" class="block font-medium text-slate-700 mb-1">Exact Location / Shelf / Drawer Description *</label>
+              <textarea id="where-loc" rows="2" placeholder="e.g. Master bedroom wooden almirah, top right drawer inside the green pouch" class="w-full p-3 rounded-xl border-2 border-slate-300 bg-slate-50" required></textarea>
+            </div>
+            <button id="btn-save-where" type="submit" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg shadow cursor-pointer">📌 Save Item Location</button>
+          </form>
+        </div>
+
+        <div class="bg-white p-5 sm:p-7 rounded-3xl shadow-sm border-2 border-slate-200 space-y-4">
+          <h3 id="txt-where-search-heading" class="text-xl font-bold text-slate-900">Find Kept Items</h3>
+          <input id="where-search" type="text" placeholder="🔍 Search item name (e.g. key, passport, specs)..." oninput="renderWhereList()" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50">
+          <div id="where-list" class="space-y-3"></div>
+        </div>
+      </section>
+
+      <!-- TAB 5: RECURRING BILLS & RENEWALS -->
+      <section id="view-bills" class="fade-enter hidden space-y-5">
+        <div class="bg-white p-5 sm:p-7 rounded-3xl shadow-sm border-2 border-slate-200">
+          <h2 id="txt-bills-heading" class="text-xl font-bold text-slate-900 mb-2">📅 Recurring Bills & Policy Renewals</h2>
+          <p id="txt-bills-sub" class="text-sm text-slate-500 mb-4">Track electricity bills, LPG cylinders, health policy renewals, or broadband deadlines.</p>
+          <form onsubmit="handleSaveBill(event)" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label id="lbl-bill-name" class="block font-medium text-slate-700 mb-1">Bill or Policy Name *</label>
+                <input id="bill-name" type="text" placeholder="e.g. Electricity Bill, Health Insurance, Gas Cylinder" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50" required>
+              </div>
+              <div>
+                <label id="lbl-bill-date" class="block font-medium text-slate-700 mb-1">Due Date *</label>
+                <input id="bill-due-date" type="date" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-medium" required>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label id="lbl-bill-amt" class="block font-medium text-slate-700 mb-1">Approx Amount (₹)</label>
+                <input id="bill-amount" type="number" placeholder="e.g. 1800" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-bold">
+              </div>
+              <div>
+                <label id="lbl-bill-freq" class="block font-medium text-slate-700 mb-1">Frequency</label>
+                <select id="bill-freq" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-medium">
+                  <option value="Monthly">Monthly</option>
+                  <option value="Yearly">Yearly</option>
+                  <option value="Quarterly">Quarterly</option>
+                </select>
+              </div>
+            </div>
+            <button id="btn-save-bill" type="submit" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg shadow cursor-pointer">➕ Set Bill Reminder</button>
+          </form>
+        </div>
+
+        <div class="bg-white p-5 sm:p-7 rounded-3xl shadow-sm border-2 border-slate-200">
+          <h3 id="txt-bills-upcoming-heading" class="text-xl font-bold text-slate-900 mb-4">Upcoming Due Dates</h3>
+          <div id="bills-list" class="space-y-3"></div>
+        </div>
+      </section>
+
+      <!-- TAB 6: HEALTH VITALS (BP & SUGAR) -->
+      <section id="view-vitals" class="fade-enter hidden space-y-5">
+        <div class="bg-white p-5 sm:p-7 rounded-3xl shadow-sm border-2 border-slate-200">
+          <h2 id="txt-vitals-heading" class="text-xl font-bold text-slate-900 mb-2">🩺 Blood Pressure & Sugar Log</h2>
+          <p id="txt-vitals-sub" class="text-sm text-slate-500 mb-4">Record readings to show your doctor during visits.</p>
+          <form onsubmit="handleSaveVital(event)" class="space-y-4">
+            <div class="grid grid-cols-3 gap-3">
+              <div>
+                <label id="lbl-sys" class="block text-xs font-bold uppercase text-slate-600 mb-1">Systolic (High)</label>
+                <input id="vital-sys" type="number" placeholder="120" class="input-touch w-full px-3 rounded-xl border-2 border-slate-300 bg-slate-50 font-bold">
+              </div>
+              <div>
+                <label id="lbl-dia" class="block text-xs font-bold uppercase text-slate-600 mb-1">Diastolic (Low)</label>
+                <input id="vital-dia" type="number" placeholder="80" class="input-touch w-full px-3 rounded-xl border-2 border-slate-300 bg-slate-50 font-bold">
+              </div>
+              <div>
+                <label id="lbl-pulse" class="block text-xs font-bold uppercase text-slate-600 mb-1">Pulse</label>
+                <input id="vital-pulse" type="number" placeholder="72" class="input-touch w-full px-3 rounded-xl border-2 border-slate-300 bg-slate-50 font-bold">
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label id="lbl-sugar" class="block font-medium text-slate-700 mb-1">Blood Sugar (mg/dL)</label>
+                <input id="vital-sugar" type="number" placeholder="110" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-bold">
+              </div>
+              <div>
+                <label id="lbl-sugar-type" class="block font-medium text-slate-700 mb-1">Testing Timing</label>
+                <select id="vital-sugar-type" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-medium">
+                  <option value="Fasting">Fasting (Morning Empty Stomach)</option>
+                  <option value="Post-Meal">Post-Meal (2 hrs after food)</option>
+                  <option value="Random">Random</option>
+                </select>
+              </div>
+            </div>
+            <button id="btn-save-vital" type="submit" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg shadow cursor-pointer">📊 Save Health Reading</button>
+          </form>
+        </div>
+
+        <div class="bg-white p-5 sm:p-7 rounded-3xl shadow-sm border-2 border-slate-200">
+          <div class="flex items-center justify-between mb-4">
+            <h3 id="txt-vitals-recent" class="text-xl font-bold text-slate-900">Recent Readings</h3>
+            <button id="btn-print-vitals" onclick="window.print()" class="btn-touch px-4 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 font-bold text-sm cursor-pointer">🖨️ For Doctor</button>
+          </div>
+          <div id="vitals-list" class="space-y-3"></div>
+        </div>
+      </section>
+
+      <!-- TAB 7: IMPORTANT & EMERGENCY CONTACTS -->
+      <section id="view-contacts" class="fade-enter hidden space-y-6">
+        <div class="bg-rose-50 border-2 border-rose-200 rounded-3xl p-5 shadow-sm">
+          <h2 id="txt-helplines-heading" class="text-lg font-bold text-rose-950 mb-3">🚨 24/7 National Emergency Numbers</h2>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <a href="tel:112" class="btn-touch rounded-2xl bg-white border-2 border-rose-300 p-3 text-center shadow-sm flex flex-col items-center justify-center">
+              <span id="txt-police" class="text-xs font-bold text-rose-600">Police / Emergency</span>
+              <span class="text-2xl font-black text-rose-950">📞 112</span>
+            </a>
+            <a href="tel:108" class="btn-touch rounded-2xl bg-white border-2 border-rose-300 p-3 text-center shadow-sm flex flex-col items-center justify-center">
+              <span id="txt-ambulance" class="text-xs font-bold text-rose-600">Ambulance</span>
+              <span class="text-2xl font-black text-rose-950">🚑 108</span>
+            </a>
+            <a href="tel:101" class="btn-touch rounded-2xl bg-white border-2 border-rose-300 p-3 text-center shadow-sm flex flex-col items-center justify-center">
+              <span id="txt-fire" class="text-xs font-bold text-rose-600">Fire Brigade</span>
+              <span class="text-2xl font-black text-rose-950">🚒 101</span>
+            </a>
+            <a href="tel:1090" class="btn-touch rounded-2xl bg-white border-2 border-rose-300 p-3 text-center shadow-sm flex flex-col items-center justify-center">
+              <span id="txt-senior" class="text-xs font-bold text-rose-600">Senior Helpline</span>
+              <span class="text-2xl font-black text-rose-950">👴 1090</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 sm:p-7 rounded-3xl shadow-sm border-2 border-slate-200">
+          <h3 id="txt-save-contact-heading" class="text-xl font-bold text-slate-900 mb-2">Save Important Contact</h3>
+          <form onsubmit="handleSaveContact(event)" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label id="lbl-contact-name" class="block font-medium text-slate-700 mb-1">Name & Role *</label>
+                <input id="contact-name" type="text" placeholder="e.g. Dr. Ramesh (Physician), Apollo Chemist, Son Rahul" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50" required>
+              </div>
+              <div>
+                <label id="lbl-contact-phone" class="block font-medium text-slate-700 mb-1">Phone Number *</label>
+                <input id="contact-phone" type="tel" placeholder="e.g. 9876543210" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-bold" required>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label id="lbl-contact-cat" class="block font-medium text-slate-700 mb-1">Category</label>
+                <select id="contact-category" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-medium">
+                  <option value="Doctor & Clinic">🩺 Doctor & Clinic</option>
+                  <option value="Chemist & Pharmacy">💊 Chemist & Pharmacy</option>
+                  <option value="Immediate Family">👨‍👩‍👧 Immediate Family</option>
+                  <option value="Trusted Neighbor">🏡 Trusted Neighbor</option>
+                  <option value="Other">📝 Other</option>
+                </select>
+              </div>
+              <div>
+                <label id="lbl-contact-note" class="block font-medium text-slate-700 mb-1">Note (Optional)</label>
+                <input id="contact-note" type="text" placeholder="e.g. Available 6 PM - 9 PM" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50">
+              </div>
+            </div>
+            <button id="btn-save-contact" type="submit" class="btn-touch w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg shadow cursor-pointer">💾 Save Contact</button>
+          </form>
+        </div>
+
+        <div class="bg-white p-5 sm:p-7 rounded-3xl shadow-sm border-2 border-slate-200">
+          <h3 id="txt-contact-directory" class="text-xl font-bold text-slate-900 mb-4">Saved Directory</h3>
+          <div id="contacts-list" class="space-y-3"></div>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="text-center py-4 text-slate-500 text-sm border-t bg-white">
+      <span id="txt-footer">Daily Helper • Complete Personal Life Companion</span>
+    </footer>
+  </div>
+
+  <!-- ADD MEDICINE MODAL -->
+  <div id="med-modal" class="fixed inset-0 z-50 bg-black/70 hidden items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-5 space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h3 id="txt-med-modal-title" class="text-xl font-bold text-slate-900">Add Medicine Schedule</h3>
+        <button onclick="closeAddMedicineModal()" class="text-xl font-bold p-2 cursor-pointer">✕</button>
+      </div>
+      <form onsubmit="handleSaveMedicine(event)" class="space-y-4">
+        <div>
+          <label id="lbl-med-name" class="block font-medium text-slate-700 mb-1">Medicine Name & Power *</label>
+          <input id="med-name" type="text" placeholder="e.g. Telma 40, Glycomet 500" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50" required>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label id="lbl-med-dosage" class="block font-medium text-slate-700 mb-1">Dosage *</label>
+            <input id="med-dosage" type="text" placeholder="e.g. 1 Tablet" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50" required>
+          </div>
+          <div>
+            <label id="lbl-med-food" class="block font-medium text-slate-700 mb-1">Food Rule *</label>
+            <select id="med-food" class="input-touch w-full px-4 rounded-xl border-2 border-slate-300 bg-slate-50 font-medium">
+              <option value="After Food">🍽️ After Food</option>
+              <option value="Before Food">🥣 Before Food</option>
+              <option value="With Meal">🥗 With Meal</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label id="lbl-med-slots" class="block font-bold text-slate-800 mb-2">Time Slot (Choose at least one) *</label>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="p-3 border-2 rounded-xl flex items-center gap-2 cursor-pointer bg-amber-50"><input id="slot-chk-morning" type="checkbox" class="accent-amber-600"> ☀️ Morning</label>
+            <label class="p-3 border-2 rounded-xl flex items-center gap-2 cursor-pointer bg-orange-50"><input id="slot-chk-afternoon" type="checkbox" class="accent-orange-600"> 🌤️ Afternoon</label>
+            <label class="p-3 border-2 rounded-xl flex items-center gap-2 cursor-pointer bg-purple-50"><input id="slot-chk-evening" type="checkbox" class="accent-purple-600"> 🌇 Evening</label>
+            <label class="p-3 border-2 rounded-xl flex items-center gap-2 cursor-pointer bg-indigo-50"><input id="slot-chk-night" type="checkbox" class="accent-indigo-600"> 🌙 Night</label>
+          </div>
+        </div>
+        <button id="btn-save-med-modal" type="submit" class="btn-touch w-full rounded-xl bg-brand-600 text-white font-bold text-lg shadow cursor-pointer">💾 Save Medicine</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MULTI-LANGUAGE TRANSLATION DICTIONARY -->
+  <script>
+    const I18N = {
+      en: {
+        appTitle: "Daily Helper",
+        waterTitle: "Daily Hydration:",
+        waterLess: "➖ Less",
+        waterAdd: "🥛 Add Glass",
+        tabTodos: "🗓️ 1. 7-Day To-Do",
+        tabExpenses: "💰 2. Expenses",
+        tabMeds: "💊 3. Medicines",
+        tabWhere: "🔍 4. Find Item",
+        tabBills: "📅 5. Recurring Bills",
+        tabVitals: "🩺 6. Health Vitals",
+        tabContacts: "🚨 7. Contacts",
+        todosHeading: "🗓️ Tasks for Upcoming 7 Days",
+        viewAllTodos: "📋 View Entire 7-Day Plan",
+        addTaskHeading: "Schedule a Task or Appointment",
+        lblTaskDesc: "What needs to be done?",
+        lblTaskDate: "Scheduled Date:",
+        lblTaskTime: "Scheduled Time (Optional):",
+        btnAddSchedule: "➕ Add to Schedule",
+        expTodayLabel: "Today's Total Spending",
+        expFilteredLabel: "Filtered Search Total",
+        expAddHeading: "Record New Expense & Bill",
+        lblExpDesc: "Expense Description",
+        lblExpAmt: "Amount (₹ INR)",
+        lblExpCat: "Category",
+        lblExpDate: "Expense Date",
+        lblExpPhoto: "📷 Attach Bill / Receipt Screenshot (Optional)",
+        btnSaveExp: "+ Save Expense Entry",
+        expSearchHeading: "5-Year Bill & Expense Search",
+        medHeader: "💊 7-Day Medicine Planner (Today + Next 6 Days)",
+        btnAddMedModal: "➕ Add Medicine",
+        lblMedTotal: "Doses on this Day",
+        lblMedTaken: "Taken ✅",
+        lblMedPending: "Pending ⏳",
+        slotMorning: "☀️ Morning (Breakfast)",
+        slotAfternoon: "🌤️ Afternoon (Lunch)",
+        slotEvening: "🌇 Evening (Tea)",
+        slotNight: "🌙 Night (Dinner/Bedtime)",
+        whereHeading: "🔍 Where Did I Keep It? (Misplaced Item Finder)",
+        whereSub: "Record where keys, passbooks, insurance cards, and documents are kept.",
+        lblWhereItem: "Item or Document Name *",
+        lblWhereRoom: "Room / Storage Area *",
+        lblWhereLoc: "Exact Location / Shelf / Drawer Description *",
+        btnSaveWhere: "📌 Save Item Location",
+        whereSearchHeading: "Find Kept Items",
+        billsHeading: "📅 Recurring Bills & Policy Renewals",
+        billsSub: "Track electricity bills, LPG cylinders, health policy renewals, or broadband deadlines.",
+        lblBillName: "Bill or Policy Name *",
+        lblBillDate: "Due Date *",
+        lblBillAmt: "Approx Amount (₹)",
+        lblBillFreq: "Frequency",
+        btnSaveBill: "➕ Set Bill Reminder",
+        billsUpcomingHeading: "Upcoming Due Dates",
+        vitalsHeading: "🩺 Blood Pressure & Sugar Log",
+        vitalsSub: "Record readings to show your doctor during visits.",
+        lblSys: "Systolic (High)",
+        lblDia: "Diastolic (Low)",
+        lblPulse: "Pulse",
+        lblSugar: "Blood Sugar (mg/dL)",
+        lblSugarType: "Testing Timing",
+        btnSaveVital: "📊 Save Health Reading",
+        vitalsRecent: "Recent Readings",
+        btnPrintVitals: "🖨️ For Doctor",
+        helplinesHeading: "🚨 24/7 National Emergency Numbers",
+        police: "Police / Emergency",
+        ambulance: "Ambulance",
+        fire: "Fire Brigade",
+        senior: "Senior Helpline",
+        saveContactHeading: "Save Important Contact",
+        lblContactName: "Name & Role *",
+        lblContactPhone: "Phone Number *",
+        lblContactCat: "Category",
+        lblContactNote: "Note (Optional)",
+        btnSaveContact: "💾 Save Contact",
+        contactDirectory: "Saved Directory",
+        callNow: "📞 Call",
+        markTaken: "Mark Taken",
+        takenBadge: "✅ Taken",
+        medModalTitle: "Add Medicine Schedule",
+        lblMedName: "Medicine Name & Power *",
+        lblMedDosage: "Dosage *",
+        lblMedFood: "Food Rule *",
+        lblMedSlots: "Time Slot (Choose at least one) *",
+        btnSaveMedModal: "💾 Save Medicine",
+        footer: "Daily Helper • Complete Personal Life Companion"
+      },
+      or: {
+        appTitle: "ଡେଲି ହେଲ୍ପର (Daily Helper)",
+        waterTitle: "ଦୈନନ୍ଦିନ ପାଣି ପିଇବା:",
+        waterLess: "➖ କମ",
+        waterAdd: "🥛 ଗ୍ଲାସ୍ ଯୋଡ଼ନ୍ତୁ",
+        tabTodos: "🗓️ ୧. ୭-ଦିନର କାର୍ଯ୍ୟ",
+        tabExpenses: "💰 ୨. ଖର୍ଚ୍ଚ ତାଲିକା",
+        tabMeds: "💊 ୩. ଔଷଧ ସମୟ",
+        tabWhere: "🔍 ୪. କେଉଁଠି ରଖିଛି?",
+        tabBills: "📅 ୫. ବିଲ୍ ଓ ପଲିସି",
+        tabVitals: "🩺 ୬. ସ୍ୱାସ୍ଥ୍ୟ ରେକର୍ଡ",
+        tabContacts: "🚨 ୭. ଜରୁରୀ ନମ୍ବର",
+        todosHeading: "🗓️ ଆଗାମୀ ୭ ଦିନର କାର୍ଯ୍ୟସୂଚୀ",
+        viewAllTodos: "📋 ସମସ୍ତ ୭ ଦିନର ଯୋଜନା ଦେଖନ୍ତୁ",
+        addTaskHeading: "ନୂତନ କାମ କିମ୍ବା ଡାକ୍ତର ଦେଖାଇବା ତାରିଖ ଲେଖନ୍ତୁ",
+        lblTaskDesc: "କ'ଣ କରିବାକୁ ହେବ?",
+        lblTaskDate: "ନିର୍ଦ୍ଦିଷ୍ଟ ତାରିଖ:",
+        lblTaskTime: "ସମୟ (ଇଚ୍ଛାଧୀନ):",
+        btnAddSchedule: "➕ କାର୍ଯ୍ୟସୂଚୀରେ ଯୋଡ଼ନ୍ତୁ",
+        expTodayLabel: "ଆଜିର ମୋଟ ଖର୍ଚ୍ଚ",
+        expFilteredLabel: "ଖୋଜାଯାଇଥିବା ମୋଟ ଖର୍ଚ୍ଚ",
+        expAddHeading: "ନୂଆ ଖର୍ଚ୍ଚ ଓ ବିଲ୍ ରେକର୍ଡ କରନ୍ତୁ",
+        lblExpDesc: "ଖର୍ଚ୍ଚର ବିବରଣୀ",
+        lblExpAmt: "ଟଙ୍କା (₹ INR)",
+        lblExpCat: "ବର୍ଗ",
+        lblExpDate: "ଖର୍ଚ୍ଚ ତାରିଖ",
+        lblExpPhoto: "📷 ବିଲ୍ / ରସିଦ୍ ଫଟୋ ଯୋଡ଼ନ୍ତୁ (ଇଚ୍ଛାଧୀନ)",
+        btnSaveExp: "+ ଖର୍ଚ୍ଚ ସେଭ୍ କରନ୍ତୁ",
+        expSearchHeading: "୫ ବର୍ଷର ବିଲ୍ ଓ ଖର୍ଚ୍ଚ ଖୋଜନ୍ତୁ",
+        medHeader: "💊 ୭ ଦିନର ଔଷଧ ସୂଚୀ (ଆଜି + ଆଗାମୀ ୬ ଦିନ)",
+        btnAddMedModal: "➕ ଔଷଧ ଯୋଡ଼ନ୍ତୁ",
+        lblMedTotal: "ଆଜିର ମୋଟ ଡୋଜ୍",
+        lblMedTaken: "ନେଇସାରିଛି ✅",
+        lblMedPending: "ବାକି ଅଛି ⏳",
+        slotMorning: "☀️ ସକାଳ (ଜଳଖିଆ)",
+        slotAfternoon: "🌤️ ଅପରାହ୍ନ (ମଧ୍ୟାହ୍ନ ଭୋଜନ)",
+        slotEvening: "🌇 ସନ୍ଧ୍ୟା (ଚାହା ସମୟ)",
+        slotNight: "🌙 ରାତି (ରାତ୍ରି ଭୋଜନ / ଶୋଇବା)",
+        whereHeading: "🔍 କେଉଁଠି ରଖିଛି? (ଜିନିଷ ଖୋଜିବା ସହାୟକ)",
+        whereSub: "ଘରର ଚାବି, ବ୍ୟାଙ୍କ ବହି, ବୀମା କାଗଜ ଓ ଡକ୍ୟୁମେଣ୍ଟ୍ କେଉଁଠି ରଖିଛନ୍ତି ଲଗ୍ କରନ୍ତୁ।",
+        lblWhereItem: "ଜିନିଷ କିମ୍ବା ଡକ୍ୟୁମେଣ୍ଟ୍ ନାମ *",
+        lblWhereRoom: "ରୁମ୍ କିମ୍ବା ସ୍ଥାନ *",
+        lblWhereLoc: "କେଉଁ ଥାକ / ଡ୍ରୟର / ପାଉଚ୍ ରେ ଅଛି *",
+        btnSaveWhere: "📌 ସ୍ଥାନ ସେଭ୍ କରନ୍ତୁ",
+        whereSearchHeading: "ରଖାଯାଇଥିବା ଜିନିଷ ଖୋଜନ୍ତୁ",
+        billsHeading: "📅 ନିୟମିତ ବିଲ୍ ଓ ବୀମା ତାରିଖ",
+        billsSub: "ବିଜୁଳି ବିଲ୍, ଗ୍ୟାସ୍ ସିଲିଣ୍ଡର, ସ୍ୱାସ୍ଥ୍ୟ ବୀମା କିମ୍ବା ରିଚାର୍ଜ ତାରିଖ ମନେରଖନ୍ତୁ।",
+        lblBillName: "ବିଲ୍ କିମ୍ବା ପଲିସି ନାମ *",
+        lblBillDate: "ଶେଷ ତାରିଖ (Due Date) *",
+        lblBillAmt: "ଆନୁମାନିକ ଟଙ୍କା (₹)",
+        lblBillFreq: "ଆବୃତ୍ତି (Frequency)",
+        btnSaveBill: "➕ ରିମାଇଣ୍ଡର୍ ସେଟ୍ କରନ୍ତୁ",
+        billsUpcomingHeading: "ଆଗାମୀ ଦେୟ ତାରିଖ",
+        vitalsHeading: "🩺 ରକ୍ତଚାପ (BP) ଓ ସୁଗାର୍ ଲଗ୍",
+        vitalsSub: "ଡାକ୍ତରଙ୍କୁ ଦେଖାଇବା ପାଇଁ ନିୟମିତ ରିପୋର୍ଟ୍ ସୁରକ୍ଷିତ ରଖନ୍ତୁ।",
+        lblSys: "ସିଷ୍ଟୋଲିକ୍ (ଉଚ୍ଚ)",
+        lblDia: "ଡାୟାଷ୍ଟୋଲିକ୍ (କମ୍)",
+        lblPulse: "ନାଡ଼ି ସ୍ପନ୍ଦନ (Pulse)",
+        lblSugar: "ବ୍ଲଡ୍ ସୁଗାର୍ (mg/dL)",
+        lblSugarType: "ପରୀକ୍ଷା ସମୟ",
+        btnSaveVital: "📊 ସ୍ୱାସ୍ଥ୍ୟ ରିପୋର୍ଟ୍ ସେଭ୍ କରନ୍ତୁ",
+        vitalsRecent: "ନିକଟତମ ରିପୋର୍ଟ୍",
+        btnPrintVitals: "🖨️ ଡାକ୍ତରଙ୍କ ପାଇଁ ପ୍ରିଣ୍ଟ୍",
+        helplinesHeading: "🚨 ୨୪/୭ ଜାତୀୟ ଜରୁରୀକାଳୀନ ନମ୍ବର",
+        police: "ପୋଲିସ୍ / ଜରୁରୀ ସେବା",
+        ambulance: "ଆମ୍ବୁଲାନ୍ସ",
+        fire: "ଅଗ୍ନିଶମ ବାହିନୀ",
+        senior: "ବରିଷ୍ଠ ନାଗରିକ ସହାୟତା",
+        saveContactHeading: "ଜରୁରୀ ଫୋନ୍ ନମ୍ବର ସେଭ୍ କରନ୍ତୁ",
+        lblContactName: "ବ୍ୟକ୍ତି / ଡାକ୍ତରଙ୍କ ନାମ *",
+        lblContactPhone: "ଫୋନ୍ ନମ୍ବର *",
+        lblContactCat: "ବର୍ଗ",
+        lblContactNote: "ନୋଟ୍ (ଇଚ୍ଛାଧୀନ)",
+        btnSaveContact: "💾 କଣ୍ଟାକ୍ଟ ସେଭ୍ କରନ୍ତୁ",
+        contactDirectory: "ସେଭ୍ ଥିବା ତାଲିକା",
+        callNow: "📞 କଲ୍",
+        markTaken: "ନେଇଗଲି",
+        takenBadge: "✅ ନେଇସାରିଛି",
+        medModalTitle: "ଔଷଧ ସମୟ ସେଟ୍ କରନ୍ତୁ",
+        lblMedName: "ଔଷଧ ନାମ ଓ ପାୱାର୍ *",
+        lblMedDosage: "ଡୋଜ୍ (ପରିମାଣ) *",
+        lblMedFood: "ଖାଇବା ନିୟମ *",
+        lblMedSlots: "ସମୟ (ଅନ୍ତତଃ ଗୋଟିଏ ବାଛନ୍ତୁ) *",
+        btnSaveMedModal: "💾 ଔଷଧ ସେଭ୍ କରନ୍ତୁ",
+        footer: "ଡେଲି ହେଲ୍ପର • ଆପଣଙ୍କ ପ୍ରତିଦିନର ବିଶ୍ୱସ୍ତ ସହଯୋଗୀ"
+      },
+      hi: {
+        appTitle: "डेली हेल्पर (Daily Helper)",
+        waterTitle: "दैनिक पानी का हिसाब:",
+        waterLess: "➖ कम",
+        waterAdd: "🥛 ग्लास जोड़ें",
+        tabTodos: "🗓️ 1. 7-दिन के काम",
+        tabExpenses: "💰 2. दैनिक खर्चे",
+        tabMeds: "💊 3. दवाइयों का समय",
+        tabWhere: "🔍 4. सामान कहाँ रखा?",
+        tabBills: "📅 5. बिल व रिन्यूअल",
+        tabVitals: "🩺 6. स्वास्थ्य रिकॉर्ड",
+        tabContacts: "🚨 7. जरूरी संपर्क",
+        todosHeading: "🗓️ आने वाले 7 दिनों की कार्यसूची",
+        viewAllTodos: "📋 पूरा 7 दिनों का प्लान देखें",
+        addTaskHeading: "नया काम या डॉक्टर अपॉइंटमेंट जोड़ें",
+        lblTaskDesc: "क्या काम करना है?",
+        lblTaskDate: "तारीख:",
+        lblTaskTime: "समय (वैकल्पिक):",
+        btnAddSchedule: "➕ शेड्यूल में जोड़ें",
+        expTodayLabel: "आज का कुल खर्च",
+        expFilteredLabel: "सर्च किया गया कुल खर्च",
+        expAddHeading: "नया खर्च व बिल दर्ज करें",
+        lblExpDesc: "खर्च का विवरण",
+        lblExpAmt: "राशि (₹ INR)",
+        lblExpCat: "श्रेणी (Category)",
+        lblExpDate: "खर्च की तारीख",
+        lblExpPhoto: "📷 बिल या रसीद का फोटो जोड़ें (वैकल्पिक)",
+        btnSaveExp: "+ खर्च सेव करें",
+        expSearchHeading: "5 साल के बिल और खर्च खोजें",
+        medHeader: "💊 7 दिन का दवा कैलेंडर (आज + अगले 6 दिन)",
+        btnAddMedModal: "➕ दवाई जोड़ें",
+        lblMedTotal: "आज की कुल खुराक",
+        lblMedTaken: "ले ली गई ✅",
+        lblMedPending: "बाकी है ⏳",
+        slotMorning: "☀️ सुबह (नाश्ता)",
+        slotAfternoon: "🌤️ दोपहर (लंच)",
+        slotEvening: "🌇 शाम (चाय)",
+        slotNight: "🌙 रात (डिनर / सोते समय)",
+        whereHeading: "🔍 सामान कहाँ रखा? (खोया-पाया सहायक)",
+        whereSub: "चाबियां, पासबुक, इंश्योरेंस कार्ड और जरूरी कागजात कहाँ रखे हैं दर्ज करें।",
+        lblWhereItem: "सामान या दस्तावेज़ का नाम *",
+        lblWhereRoom: "कमरा या जगह *",
+        lblWhereLoc: "किस अलमारी / दराज / बैग में रखा है *",
+        btnSaveWhere: "📌 स्थान सुरक्षित करें",
+        whereSearchHeading: "रखा हुआ सामान खोजें",
+        billsHeading: "📅 नियमित बिल व पॉलिसी रिन्यूअल",
+        billsSub: "बिजली बिल, गैस सिलेंडर, हेल्थ इंश्योरेंस या रिचार्ज की अंतिम तारीख याद रखें।",
+        lblBillName: "बिल या पॉलिसी का नाम *",
+        lblBillDate: "अंतिम तारीख (Due Date) *",
+        lblBillAmt: "अनुमानित राशि (₹)",
+        lblBillFreq: "आवृत्ति (Frequency)",
+        btnSaveBill: "➕ रिमाइंडर सेट करें",
+        billsUpcomingHeading: "आगामी अंतिम तारीखें",
+        vitalsHeading: "🩺 ब्लड प्रेशर (BP) व शुगर लॉग",
+        vitalsSub: "डॉक्टर को दिखाने के लिए अपने चेकअप की सही हिस्ट्री रखें।",
+        lblSys: "सिस्टोलिक (High BP)",
+        lblDia: "डायस्टोलिक (Low BP)",
+        lblPulse: "पल्स (Pulse)",
+        lblSugar: "ब्लड शुगर (mg/dL)",
+        lblSugarType: "जांच का समय",
+        btnSaveVital: "📊 स्वास्थ्य रीडिंग सेव करें",
+        vitalsRecent: "हाल की जांच रिपोर्ट",
+        btnPrintVitals: "🖨️ डॉक्टर हेतु प्रिंट",
+        helplinesHeading: "🚨 24/7 राष्ट्रीय आपातकालीन नंबर",
+        police: "पुलिस / आपातकाल",
+        ambulance: "एम्बुलेंस",
+        fire: "दमकल सेवा",
+        senior: "वरिष्ठ नागरिक हेल्पलाइन",
+        saveContactHeading: "महत्वपूर्ण संपर्क सेव करें",
+        lblContactName: "व्यक्ति / डॉक्टर का नाम *",
+        lblContactPhone: "फ़ोन नंबर *",
+        lblContactCat: "श्रेणी",
+        lblContactNote: "नोट (वैकल्पिक)",
+        btnSaveContact: "💾 संपर्क सेव करें",
+        contactDirectory: "सहेजी गई डायरेक्टरी",
+        callNow: "📞 कॉल करें",
+        markTaken: "दवा ले ली",
+        takenBadge: "✅ ले ली गई",
+        medModalTitle: "दवाई का समय सेट करें",
+        lblMedName: "दवाई का नाम व पावर *",
+        lblMedDosage: "खुराक (डोज़) *",
+        lblMedFood: "खाने का नियम *",
+        lblMedSlots: "समय (कम से कम एक चुनें) *",
+        btnSaveMedModal: "💾 दवाई सेव करें",
+        footer: "डेली हेल्पर • आपका भरोसेमंद दैनिक जीवन साथी"
+      },
+      bn: {
+        appTitle: "ডেইলি হেল্পার (Daily Helper)",
+        waterTitle: "দৈনিক জল পানের হিসাব:",
+        waterLess: "➖ কম",
+        waterAdd: "🥛 গ্লাস যোগ করুন",
+        tabTodos: "🗓️ ১. ৭-দিনের কাজ",
+        tabExpenses: "💰 ২. খরচের হিসাব",
+        tabMeds: "💊 ৩. ওষুধের তালিকা",
+        tabWhere: "🔍 ৪. জিনিস কোথায় রেখেছি?",
+        tabBills: "📅 ৫. বিল ও রিনিউয়াল",
+        tabVitals: "🩺 ৬. স্বাস্থ্য রেকর্ড",
+        tabContacts: "🚨 ৭. জরুরি যোগাযোগ",
+        todosHeading: "🗓️ আগামী ৭ দিনের কাজের তালিকা",
+        viewAllTodos: "📋 পুরো ৭ দিনের পরিকল্পনা দেখুন",
+        addTaskHeading: "নতুন কাজ বা ডাক্তারের অ্যাপয়েন্টমেন্ট যোগ করুন",
+        lblTaskDesc: "কী কাজ করতে হবে?",
+        lblTaskDate: "নির্ধারিত তারিখ:",
+        lblTaskTime: "সময় (ঐচ্ছিক):",
+        btnAddSchedule: "➕ তালিকায় যোগ করুন",
+        expTodayLabel: "আজকের মোট খরচ",
+        expFilteredLabel: "ফিল্টার করা মোট খরচ",
+        expAddHeading: "নতুন খরচ ও বিল রেকর্ড করুন",
+        lblExpDesc: "খরচের বিবরণ",
+        lblExpAmt: "টাকা (₹ INR)",
+        lblExpCat: "বিভাগ (Category)",
+        lblExpDate: "খরচের তারিখ",
+        lblExpPhoto: "📷 বিল বা রসিদের ছবি যুক্ত করুন (ঐচ্ছিক)",
+        btnSaveExp: "+ খরচ সংরক্ষণ করুন",
+        expSearchHeading: "৫ বছরের বিল ও খরচ খুঁজুন",
+        medHeader: "💊 ৭ দিনের ওষুধ সময়সূচী (আজ + পরবর্তী ৬ দিন)",
+        btnAddMedModal: "➕ ওষুধ যোগ করুন",
+        lblMedTotal: "আজকের মোট ডোজ",
+        lblMedTaken: "নেওয়া হয়েছে ✅",
+        lblMedPending: "বাকি আছে ⏳",
+        slotMorning: "☀️ সকাল (প্রাতরাশ)",
+        slotAfternoon: "🌤️ দুপুর (লাঞ্চ)",
+        slotEvening: "🌇 বিকেল (চা পানের সময়)",
+        slotNight: "🌙 রাত (ডিনার / শোয়ার সময়)",
+        whereHeading: "🔍 জিনিস কোথায় রেখেছি? (সহায়ক সন্ধান)",
+        whereSub: "চাবি, পাসবই, বীমার কাগজ বা গুরুত্বপূর্ণ নথি কোথায় রেখেছেন লিখে রাখুন।",
+        lblWhereItem: "জিনিস বা নথির নাম *",
+        lblWhereRoom: "ঘর বা স্থান *",
+        lblWhereLoc: "কোন ড্রয়ার / তাক / ব্যাগে রাখা আছে *",
+        btnSaveWhere: "📌 স্থান সংরক্ষণ করুন",
+        whereSearchHeading: "রাখা জিনিস খুঁজুন",
+        billsHeading: "📅 নিয়মিত বিল ও পলিসি রিনিউয়াল",
+        billsSub: "বিদ্যুৎ বিল, গ্যাস সিলিন্ডার, স্বাস্থ্য বীমা বা রিচার্জের শেষ তারিখ মনে রাখুন।",
+        lblBillName: "বিল বা পলিসির নাম *",
+        lblBillDate: "শেষ তারিখ (Due Date) *",
+        lblBillAmt: "আনুমানিক টাকা (₹)",
+        lblBillFreq: "পুনরাবৃত্তি (Frequency)",
+        btnSaveBill: "➕ অনুস্মারক সেট করুন",
+        billsUpcomingHeading: "আসন্ন বিলের তারিখ",
+        vitalsHeading: "🩺 রক্তচাপ (BP) ও সুগার রেকর্ড",
+        vitalsSub: "ডাক্তারকে দেখানোর জন্য সঠিক স্বাস্থ্য পরীক্ষার রেকর্ড রাখুন।",
+        lblSys: "সিস্টোলিক (High BP)",
+        lblDia: "ডায়াস্টোলিক (Low BP)",
+        lblPulse: "পালস (Pulse)",
+        lblSugar: "ব্লাড সুগার (mg/dL)",
+        lblSugarType: "পরীক্ষার সময়",
+        btnSaveVital: "📊 স্বাস্থ্য record সংরক্ষণ করুন",
+        vitalsRecent: "সাম্প্রতিক রিপোর্ট",
+        btnPrintVitals: "🖨️ ডাক্তারের জন্য প্রিন্ট",
+        helplinesHeading: "🚨 ২৪/৭ জরুরি হেল্পলাইন নম্বর",
+        police: "পুলিশ / জরুরি সেবা",
+        ambulance: "অ্যাম্বুলেন্স",
+        fire: "দমকল বিভাগ",
+        senior: "প্রবীণ নাগরিক হেল্পলাইন",
+        saveContactHeading: "জরুরি যোগাযোগ নম্বর সংরক্ষণ করুন",
+        lblContactName: "নাম ও পরিচয় *",
+        lblContactPhone: "ফোন নম্বর *",
+        lblContactCat: "বিভাগ",
+        lblContactNote: "নোট (ঐচ্ছিক)",
+        btnSaveContact: "💾 নম্বর সংরক্ষণ করুন",
+        contactDirectory: "সংরক্ষিত তালিকা",
+        callNow: "📞 কল করুন",
+        markTaken: "ওষুধ খেয়েছি",
+        takenBadge: "✅ খাওয়া হয়েছে",
+        medModalTitle: "ওষুধের সময়সূচী যোগ করুন",
+        lblMedName: "ওষুধের নাম ও পাওয়ার *",
+        lblMedDosage: "ডোজ *",
+        lblMedFood: "খাওয়ার নিয়ম *",
+        lblMedSlots: "সময় (কমপক্ষে একটি নির্বাচন করুন) *",
+        btnSaveMedModal: "💾 ওষুধ সংরক্ষণ করুন",
+        footer: "ডেইলি হেল্পার • আপনার নির্ভরযোগ্য দৈনন্দিন জীবনের সঙ্গী"
+      }
+    };
+
+    let currentLang = 'en';
+
+    function changeLanguage(lang) {
+      currentLang = lang;
+      if (currentProfile) {
+        currentProfile.language = lang;
+        dbPut('profiles', currentProfile);
+      }
+      document.getElementById('lang-select').value = lang;
+      if (document.getElementById('prof-lang')) {
+        document.getElementById('prof-lang').value = lang;
+      }
+      applyTranslations();
+      renderTodoList();
+      renderMedicineView();
+      renderContactsList();
+    }
+
+    function applyTranslations() {
+      const t = I18N[currentLang] || I18N.en;
+      const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+      
+      setTxt('txt-app-title', t.appTitle);
+      setTxt('txt-water-title', t.waterTitle);
+      setTxt('btn-water-less', t.waterLess);
+      setTxt('btn-water-add', t.waterAdd);
+      
+      setTxt('txt-tab-todos', t.tabTodos);
+      setTxt('txt-tab-expenses', t.tabExpenses);
+      setTxt('txt-tab-meds', t.tabMeds);
+      setTxt('txt-tab-where', t.tabWhere);
+      setTxt('txt-tab-bills', t.tabBills);
+      setTxt('txt-tab-vitals', t.tabVitals);
+      setTxt('txt-tab-contacts', t.tabContacts);
+      
+      setTxt('txt-todos-heading', t.todosHeading);
+      setTxt('txt-view-all-todos', isViewingAllSevenDays ? "📅 Show Only Selected Day" : t.viewAllTodos);
+      setTxt('txt-add-task-heading', t.addTaskHeading);
+      setTxt('lbl-task-desc', t.lblTaskDesc);
+      setTxt('lbl-task-date', t.lblTaskDate);
+      setTxt('lbl-task-time', t.lblTaskTime);
+      setTxt('btn-add-task', t.btnAddSchedule);
+      
+      setTxt('txt-exp-today-label', t.expTodayLabel);
+      setTxt('txt-exp-filtered-label', t.expFilteredLabel);
+      setTxt('txt-exp-add-heading', t.expAddHeading);
+      setTxt('lbl-exp-desc', t.lblExpDesc);
+      setTxt('lbl-exp-amt', t.lblExpAmt);
+      setTxt('lbl-exp-cat', t.lblExpCat);
+      setTxt('lbl-exp-date', t.lblExpDate);
+      setTxt('lbl-exp-photo', t.lblExpPhoto);
+      setTxt('btn-save-exp', t.btnSaveExp);
+      setTxt('txt-exp-search-heading', t.expSearchHeading);
+      
+      setTxt('txt-med-header', t.medHeader);
+      setTxt('btn-add-med-modal', t.btnAddMedModal);
+      setTxt('lbl-med-total', t.lblMedTotal);
+      setTxt('lbl-med-taken', t.lblMedTaken);
+      setTxt('lbl-med-pending', t.lblMedPending);
+      setTxt('txt-slot-morning', t.slotMorning);
+      setTxt('txt-slot-afternoon', t.slotAfternoon);
+      setTxt('txt-slot-evening', t.slotEvening);
+      setTxt('txt-slot-night', t.slotNight);
+      
+      setTxt('txt-where-heading', t.whereHeading);
+      setTxt('txt-where-sub', t.whereSub);
+      setTxt('lbl-where-item', t.lblWhereItem);
+      setTxt('lbl-where-room', t.lblWhereRoom);
+      setTxt('lbl-where-loc', t.lblWhereLoc);
+      setTxt('btn-save-where', t.btnSaveWhere);
+      setTxt('txt-where-search-heading', t.whereSearchHeading);
+      
+      setTxt('bills-heading', t.billsHeading);
+      setTxt('txt-bills-sub', t.billsSub);
+      setTxt('lbl-bill-name', t.lblBillName);
+      setTxt('lbl-bill-date', t.lblBillDate);
+      setTxt('lbl-bill-amt', t.lblBillAmt);
+      setTxt('lbl-bill-freq', t.lblBillFreq);
+      setTxt('btn-save-bill', t.btnSaveBill);
+      setTxt('txt-bills-upcoming-heading', t.billsUpcomingHeading);
+      
+      setTxt('txt-vitals-heading', t.vitalsHeading);
+      setTxt('txt-vitals-sub', t.vitalsSub);
+      setTxt('lbl-sys', t.lblSys);
+      setTxt('lbl-dia', t.lblDia);
+      setTxt('lbl-pulse', t.lblPulse);
+      setTxt('lbl-sugar', t.lblSugar);
+      setTxt('lbl-sugar-type', t.lblSugarType);
+      setTxt('btn-save-vital', t.btnSaveVital);
+      setTxt('txt-vitals-recent', t.vitalsRecent);
+      setTxt('btn-print-vitals', t.btnPrintVitals);
+      
+      setTxt('txt-helplines-heading', t.helplinesHeading);
+      setTxt('txt-police', t.police);
+      setTxt('txt-ambulance', t.ambulance);
+      setTxt('txt-fire', t.fire);
+      setTxt('txt-senior', t.senior);
+      setTxt('txt-save-contact-heading', t.saveContactHeading);
+      setTxt('lbl-contact-name', t.lblContactName);
+      setTxt('lbl-contact-phone', t.lblContactPhone);
+      setTxt('lbl-contact-cat', t.lblContactCat);
+      setTxt('lbl-contact-note', t.lblContactNote);
+      setTxt('btn-save-contact', t.btnSaveContact);
+      setTxt('txt-contact-directory', t.contactDirectory);
+      
+      setTxt('txt-med-modal-title', t.medModalTitle);
+      setTxt('lbl-med-name', t.lblMedName);
+      setTxt('lbl-med-dosage', t.lblMedDosage);
+      setTxt('lbl-med-food', t.lblMedFood);
+      setTxt('lbl-med-slots', t.lblMedSlots);
+      setTxt('btn-save-med-modal', t.btnSaveMedModal);
+      setTxt('txt-footer', t.footer);
+    }
+  </script>
+
+  <!-- DATABASE ENGINE & APPLICATION CONTROLLER -->
+  <script>
+    const DB_NAME = 'DailyHelperMasterDB';
+    const DB_VERSION = 4;
+    let db;
+    let currentProfile = null;
+    let allProfiles = [];
+
+    let userTodos = [], userExpenses = [], userMeds = [], userMedLogs = [], userWhere = [], userBills = [], userVitals = [], userContacts = [];
+    let currentExpImage = null;
+    let profileUploadedPhoto = null;
+    let loginTempPhoto = null;
+
+    let activeTodoDate = new Date().toISOString().slice(0, 10);
+    let activeMedDate = new Date().toISOString().slice(0, 10);
+    let isViewingAllSevenDays = false;
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      document.getElementById('current-date-text').textContent = new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      document.getElementById('task-date-input').value = activeTodoDate;
+      document.getElementById('exp-date').value = activeTodoDate;
+      document.getElementById('bill-due-date').value = activeTodoDate;
+
+      populateYearDropdown();
+      buildUpcoming7DaySelector();
+      buildMedUpcoming7DaySelector();
+
+      await initDB();
+      await checkAuthGate();
+    });
+
+    function initDB() {
+      return new Promise((res) => {
+        const req = indexedDB.open(DB_NAME, DB_VERSION);
+        req.onupgradeneeded = (e) => {
+          const d = e.target.result;
+          ['profiles', 'todos', 'expenses', 'medicines', 'medLogs', 'whereItems', 'bills', 'vitals', 'contacts', 'water'].forEach(s => {
+            if (!d.objectStoreNames.contains(s)) d.createObjectStore(s, { keyPath: (s === 'water' ? 'id' : 'id') });
+          });
+        };
+        req.onsuccess = () => { db = req.result; res(); };
+        req.onerror = () => { res(); };
+      });
+    }
+
+    function dbPut(store, item) {
+      return new Promise((res, rej) => {
+        if (!db) return res();
+        try {
+          const tx = db.transaction(store, 'readwrite');
+          tx.objectStore(store).put(item);
+          tx.oncomplete = res;
+          tx.onerror = rej;
+        } catch(e) { res(); }
+      });
+    }
+
+    function dbGetAll(store) {
+      return new Promise((res) => {
+        if (!db) return res([]);
+        try {
+          const tx = db.transaction(store, 'readonly');
+          const req = tx.objectStore(store).getAll();
+          req.onsuccess = () => res(req.result || []);
+          req.onerror = () => res([]);
+        } catch(e) { res([]); }
+      });
+    }
+
+    function dbDelete(store, id) {
+      return new Promise((res) => {
+        if (!db) return res();
+        try {
+          const tx = db.transaction(store, 'readwrite');
+          tx.objectStore(store).delete(id);
+          tx.oncomplete = res;
+          tx.onerror = res;
+        } catch(e) { res(); }
+      });
+    }
+
+    /* AUTHENTICATION & LOGIN PAGE LOGIC */
+    async function checkAuthGate() {
+      let dbProfiles = [];
+      try {
+        dbProfiles = await dbGetAll('profiles');
+      } catch (err) {}
+      
+      let localProfiles = [];
+      try {
+        localProfiles = JSON.parse(localStorage.getItem('daily_helper_profiles') || '[]');
+      } catch (err) {}
+
+      const map = new Map();
+      [...dbProfiles, ...localProfiles].forEach(p => { if (p && p.id) map.set(p.id, p); });
+      allProfiles = Array.from(map.values());
+
+      const activeUserId = localStorage.getItem('daily_helper_active_user');
+
+      if (activeUserId) {
+        currentProfile = allProfiles.find(p => p.id === activeUserId);
+      } else {
+        currentProfile = null;
+      }
+
+      if (currentProfile) {
+        document.getElementById('screen-login').classList.add('hidden');
+        document.getElementById('screen-app').classList.remove('hidden');
+        document.getElementById('screen-app').classList.add('flex');
+        
+        applyProfilePreferences(currentProfile);
+        renderProfileUI();
+        await loadUserData();
+      } else {
+        document.getElementById('screen-login').classList.remove('hidden');
+        document.getElementById('screen-app').classList.add('hidden');
+        document.getElementById('screen-app').classList.remove('flex');
+        setupLoginScreen();
+      }
+    }
+
+    function setupLoginScreen() {
+      loginTempPhoto = null;
+      document.getElementById('login-avatar-preview').innerHTML = `<span>📷</span>`;
+      document.getElementById('login-name').value = '';
+      document.getElementById('login-email').value = '';
+      document.getElementById('login-password').value = '';
+      document.getElementById('login-confirm-password').value = '';
+      document.getElementById('login-photo-input').value = '';
+      document.getElementById('reg-pwd-error').classList.add('hidden');
+
+      const existingBox = document.getElementById('login-existing-box');
+      const userListEl = document.getElementById('login-existing-user-list');
+
+      if (allProfiles && allProfiles.length > 0) {
+        existingBox.classList.remove('hidden');
+        userListEl.innerHTML = '';
+        allProfiles.forEach(p => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.onclick = () => showPasswordPrompt(p.id);
+          btn.className = "w-full text-left p-3.5 rounded-2xl border-2 border-slate-200 hover:border-brand-600 bg-slate-50 hover:bg-brand-50 flex items-center justify-between transition shadow-sm cursor-pointer";
+          btn.innerHTML = `
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-xl bg-brand-600 text-white font-extrabold flex items-center justify-center overflow-hidden flex-shrink-0">
+                ${p.photo ? `<img src="${p.photo}" class="w-full h-full object-cover">` : `<span>${(p.name||'U').charAt(0).toUpperCase()}</span>`}
+              </div>
+              <div>
+                <h4 class="font-bold text-slate-900 text-sm leading-tight">${p.name}</h4>
+                <p class="text-xs text-slate-500">${p.email || 'Personal Profile'}</p>
+              </div>
+            </div>
+            <span class="text-xs font-bold text-brand-700 bg-white border border-brand-200 px-3 py-1.5 rounded-xl shadow-xs">Sign In →</span>
+          `;
+          userListEl.appendChild(btn);
+        });
+
+        setLoginViewMode('select');
+      } else {
+        existingBox.classList.add('hidden');
+        setLoginViewMode('register');
+      }
+    }
+
+    function showPasswordPrompt(userId) {
+      const user = allProfiles.find(p => p.id === userId);
+      if (!user) return;
+
+      document.getElementById('login-pwd-userid').value = user.id;
+      document.getElementById('login-pwd-username').textContent = user.name;
+      document.getElementById('login-pwd-useremail').textContent = user.email || 'Personal Profile';
+      document.getElementById('login-pwd-input').value = '';
+      document.getElementById('login-pwd-error').classList.add('hidden');
+
+      const avatarEl = document.getElementById('login-pwd-avatar');
+      if (user.photo) {
+        avatarEl.innerHTML = `<img src="${user.photo}" class="w-full h-full object-cover">`;
+      } else {
+        avatarEl.innerHTML = `<span>${(user.name||'U').charAt(0).toUpperCase()}</span>`;
+      }
+
+      setLoginViewMode('password');
+    }
+
+    function handleVerifyPassword(e) {
+      e.preventDefault();
+      const userId = document.getElementById('login-pwd-userid').value;
+      const pwd = document.getElementById('login-pwd-input').value;
+      const errEl = document.getElementById('login-pwd-error');
+
+      const user = allProfiles.find(p => p.id === userId);
+      if (user && user.password === pwd) {
+        errEl.classList.add('hidden');
+        loginAsUser(user.id);
+      } else {
+        errEl.textContent = "Incorrect password. Please try again.";
+        errEl.classList.remove('hidden');
+      }
+    }
+
+    function setLoginViewMode(mode) {
+      const regForm = document.getElementById('login-register-form');
+      const existingBox = document.getElementById('login-existing-box');
+      const passwordBox = document.getElementById('login-password-box');
+      const cancelBtn = document.getElementById('login-cancel-reg-box');
+
+      regForm.classList.add('hidden');
+      existingBox.classList.add('hidden');
+      passwordBox.classList.add('hidden');
+
+      if (mode === 'register') {
+        regForm.classList.remove('hidden');
+        if (allProfiles && allProfiles.length > 0) {
+          cancelBtn.classList.remove('hidden');
+        } else {
+          cancelBtn.classList.add('hidden');
+        }
+      } else if (mode === 'password') {
+        passwordBox.classList.remove('hidden');
+      } else {
+        existingBox.classList.remove('hidden');
+      }
+    }
+
+    function handleLoginPhotoUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        const img = new Image();
+        img.onload = () => {
+          const cvs = document.createElement('canvas');
+          let w = img.width, h = img.height;
+          const max = 400;
+          if (w > max || h > max) {
+            if (w > h) { h = Math.round(h * max / w); w = max; }
+            else { w = Math.round(w * max / h); h = max; }
+          }
+          cvs.width = w; cvs.height = h;
+          cvs.getContext('2d').drawImage(img, 0, 0, w, h);
+          loginTempPhoto = cvs.toDataURL('image/jpeg', 0.8);
+          document.getElementById('login-avatar-preview').innerHTML = `<img src="${loginTempPhoto}" class="w-full h-full object-cover">`;
+        };
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function handleAuthRegister(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+
+      const name = (document.getElementById('login-name').value || '').trim();
+      const email = (document.getElementById('login-email').value || '').trim();
+      const password = document.getElementById('login-password').value;
+      const confirmPassword = document.getElementById('login-confirm-password').value;
+      const lang = document.getElementById('login-lang').value || 'en';
+      const size = document.getElementById('login-size').value || 'normal';
+      const errEl = document.getElementById('reg-pwd-error');
+
+      if (!name) {
+        alert("Please enter your name");
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        if (errEl) {
+          errEl.textContent = "Passwords do not match. Please re-enter.";
+          errEl.classList.remove('hidden');
+        } else {
+          alert("Passwords do not match.");
+        }
+        return;
+      }
+      if (errEl) errEl.classList.add('hidden');
+
+      const newUser = {
+        id: 'usr_' + Date.now(),
+        name: name,
+        email: email,
+        password: password,
+        photo: loginTempPhoto || null,
+        language: lang,
+        textSize: size,
+        createdAt: new Date().toISOString()
+      };
+
+      let localList = [];
+      try {
+        localList = JSON.parse(localStorage.getItem('daily_helper_profiles') || '[]');
+      } catch (err) {
+        localList = [];
+      }
+      localList.push(newUser);
+      localStorage.setItem('daily_helper_profiles', JSON.stringify(localList));
+      localStorage.setItem('daily_helper_active_user', newUser.id);
+
+      try {
+        await dbPut('profiles', newUser);
+      } catch (err) {
+        console.warn('DB sync warning:', err);
+      }
+
+      currentProfile = newUser;
+      allProfiles = localList;
+      
+      document.getElementById('screen-login').classList.add('hidden');
+      document.getElementById('screen-app').classList.remove('hidden');
+      document.getElementById('screen-app').classList.add('flex');
+      
+      applyProfilePreferences(newUser);
+      renderProfileUI();
+      await loadUserData();
+    }
+
+    async function loginAsUser(userId) {
+      localStorage.setItem('daily_helper_active_user', userId);
+      await checkAuthGate();
+    }
+
+    function signOutProfile() {
+      localStorage.removeItem('daily_helper_active_user');
+      currentProfile = null;
+      userTodos = [];
+      userExpenses = [];
+      userMeds = [];
+      userMedLogs = [];
+      userWhere = [];
+      userBills = [];
+      userVitals = [];
+      userContacts = [];
+      checkAuthGate();
+    }
+
+    function promptNewUserRegister() {
+      signOutProfile();
+      setLoginViewMode('register');
+    }
+
+    function applyProfilePreferences(profile) {
+      setFontSize(profile.textSize || 'normal');
+      currentLang = profile.language || 'en';
+      document.getElementById('lang-select').value = currentLang;
+      applyTranslations();
+
+      document.getElementById('header-user-name').textContent = profile.name;
+      const initial = (profile.name || 'U').trim().charAt(0).toUpperCase();
+
+      const headerBox = document.getElementById('header-avatar-box');
+      if (profile.photo) {
+        headerBox.innerHTML = `<img src="${profile.photo}" class="w-full h-full object-cover">`;
+      } else {
+        headerBox.innerHTML = `<span>${initial}</span>`;
+      }
+    }
+
+    function renderProfileUI() {
+      if (!currentProfile) return;
+      document.getElementById('prof-name').value = currentProfile.name;
+      document.getElementById('prof-email').value = currentProfile.email || '';
+      document.getElementById('prof-lang').value = currentProfile.language || 'en';
+      document.getElementById('prof-text-size').value = currentProfile.textSize || 'normal';
+      document.getElementById('prof-password').value = '';
+
+      const largeBox = document.getElementById('profile-avatar-large');
+      if (currentProfile.photo) {
+        largeBox.innerHTML = `<img src="${currentProfile.photo}" class="w-full h-full object-cover">`;
+      } else {
+        const initial = (currentProfile.name || 'U').trim().charAt(0).toUpperCase();
+        largeBox.innerHTML = `<span>${initial}</span>`;
+      }
+
+      const quickSelect = document.getElementById('profile-quick-select');
+      quickSelect.innerHTML = '';
+      allProfiles.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.id;
+        opt.textContent = `👤 ${p.name}` + (p.id === currentProfile.id ? ' (Active)' : '');
+        if (p.id === currentProfile.id) opt.selected = true;
+        quickSelect.appendChild(opt);
+      });
+
+      const container = document.getElementById('profile-cards-container');
+      container.innerHTML = '';
+      allProfiles.forEach(p => {
+        const isCurrent = (p.id === currentProfile.id);
+        const card = document.createElement('div');
+        card.className = `p-4 rounded-2xl border-2 flex items-center justify-between gap-3 ${isCurrent ? 'bg-brand-50 border-brand-500 shadow-sm' : 'bg-white border-slate-200'}`;
+        card.innerHTML = `
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-brand-600 text-white font-bold text-xl flex items-center justify-center overflow-hidden border border-brand-700">
+              ${p.photo ? `<img src="${p.photo}" class="w-full h-full object-cover">` : `<span>${(p.name || 'U').charAt(0).toUpperCase()}</span>`}
+            </div>
+            <div>
+              <h4 class="font-bold text-slate-900">${p.name}</h4>
+              <p class="text-xs text-slate-500">${p.email || 'No email registered'}</p>
+              <span class="text-xs font-bold text-brand-700">${p.language.toUpperCase()} • ${p.textSize}</span>
+            </div>
+          </div>
+          <div>
+            ${isCurrent ? '<span class="text-xs font-bold bg-brand-600 text-white px-3 py-1.5 rounded-xl">Active</span>' : `<button onclick="handleQuickSwitchUser('${p.id}')" class="btn-touch px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl text-xs font-bold cursor-pointer">Switch</button>`}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    async function handleSaveCurrentProfile(e) {
+      e.preventDefault();
+      if (!currentProfile) return;
+      currentProfile.name = document.getElementById('prof-name').value.trim();
+      currentProfile.email = document.getElementById('prof-email').value.trim();
+      currentProfile.language = document.getElementById('prof-lang').value;
+      currentProfile.textSize = document.getElementById('prof-text-size').value;
+
+      const newPwd = document.getElementById('prof-password').value;
+      if (newPwd && newPwd.trim().length > 0) {
+        currentProfile.password = newPwd.trim();
+      }
+
+      if (profileUploadedPhoto) {
+        currentProfile.photo = profileUploadedPhoto;
+      }
+
+      await dbPut('profiles', currentProfile);
+      
+      let localProfiles = [];
+      try {
+        localProfiles = JSON.parse(localStorage.getItem('daily_helper_profiles') || '[]');
+      } catch (err) {}
+      const idx = localProfiles.findIndex(x => x.id === currentProfile.id);
+      if (idx !== -1) localProfiles[idx] = currentProfile;
+      else localProfiles.push(currentProfile);
+      localStorage.setItem('daily_helper_profiles', JSON.stringify(localProfiles));
+
+      allProfiles = localProfiles;
+      applyProfilePreferences(currentProfile);
+      renderProfileUI();
+      alert("Personal profile updated successfully!");
+    }
+
+    function handleProfilePhotoUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        const img = new Image();
+        img.onload = () => {
+          const cvs = document.createElement('canvas');
+          let w = img.width, h = img.height;
+          const max = 400;
+          if (w > max || h > max) {
+            if (w > h) { h = Math.round(h * max / w); w = max; }
+            else { w = Math.round(w * max / h); h = max; }
+          }
+          cvs.width = w; cvs.height = h;
+          cvs.getContext('2d').drawImage(img, 0, 0, w, h);
+          profileUploadedPhoto = cvs.toDataURL('image/jpeg', 0.8);
+          document.getElementById('profile-avatar-large').innerHTML = `<img src="${profileUploadedPhoto}" class="w-full h-full object-cover">`;
+        };
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeProfilePhoto() {
+      profileUploadedPhoto = null;
+      if (currentProfile) {
+        currentProfile.photo = null;
+        dbPut('profiles', currentProfile);
+        renderProfileUI();
+        applyProfilePreferences(currentProfile);
+      }
+    }
+
+    function handleQuickSwitchUser(id) {
+      if (currentProfile && currentProfile.id === id) return;
+      signOutProfile();
+      showPasswordPrompt(id);
+    }
+
+    /* DATA RETRIEVAL ISOLATED BY USER */
+    async function loadUserData() {
+      if (!currentProfile) return;
+      const pid = currentProfile.id;
+
+      let localTodos = [];
+      try {
+        localTodos = JSON.parse(localStorage.getItem('daily_helper_todos_' + pid) || '[]');
+      } catch (err) {
+        localTodos = [];
+      }
+      const rawTodos = await dbGetAll('todos');
+      const dbUserTodos = rawTodos.filter(x => x.profileId === pid);
+      const todoMap = new Map();
+      [...localTodos, ...dbUserTodos].forEach(item => { if (item && item.id) todoMap.set(item.id, item); });
+      userTodos = Array.from(todoMap.values());
+
+      const rawExpenses = await dbGetAll('expenses');
+      const rawMeds = await dbGetAll('medicines');
+      const rawMedLogs = await dbGetAll('medLogs');
+      const rawWhere = await dbGetAll('whereItems');
+      const rawBills = await dbGetAll('bills');
+      const rawVitals = await dbGetAll('vitals');
+      const rawContacts = await dbGetAll('contacts');
+
+      userExpenses = rawExpenses.filter(x => x.profileId === pid);
+      userMeds = rawMeds.filter(x => x.profileId === pid);
+      userMedLogs = rawMedLogs.filter(x => x.profileId === pid);
+      userWhere = rawWhere.filter(x => x.profileId === pid);
+      userBills = rawBills.filter(x => x.profileId === pid);
+      userVitals = rawVitals.filter(x => x.profileId === pid);
+      userContacts = rawContacts.filter(x => x.profileId === pid);
+
+      renderTodoList();
+      renderExpenseList();
+      renderMedicineView();
+      renderWhereList();
+      renderBillsList();
+      renderVitalsList();
+      renderContactsList();
+      loadWater();
+    }
+
+    function switchTab(target) {
+      ['todos', 'expenses', 'meds', 'where', 'bills', 'vitals', 'contacts', 'profile'].forEach(t => {
+        const view = document.getElementById(`view-${t}`);
+        const btn = document.getElementById(`tab-${t}`);
+        if (t === target) {
+          view.classList.remove('hidden');
+          view.classList.add('block');
+          if (btn) btn.className = "btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition shadow border-2 border-brand-600 bg-brand-600 text-white flex items-center justify-center gap-1.5";
+        } else {
+          view.classList.add('hidden');
+          view.classList.remove('block');
+          if (btn) {
+            if (t === 'profile') {
+              btn.className = "btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition border-2 border-purple-300 bg-purple-50 text-purple-900 hover:bg-purple-100 flex items-center justify-center gap-1.5";
+            } else {
+              btn.className = "btn-touch px-3 py-2.5 rounded-2xl font-bold text-sm sm:text-base transition border-2 border-slate-300 bg-white text-slate-700 hover:bg-slate-50 flex items-center justify-center gap-1.5";
+            }
+          }
+        }
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function setFontSize(size) {
+      document.body.classList.remove('font-normal', 'font-large', 'font-xlarge');
+      document.body.classList.add('font-' + size);
+      if (currentProfile) {
+        currentProfile.textSize = size;
+        dbPut('profiles', currentProfile);
+      }
+    }
+
+    /* WATER TRACKER (User-Scoped) */
+    function getTodayKey() {
+      return (currentProfile ? currentProfile.id : 'usr') + '_' + new Date().toISOString().slice(0, 10);
+    }
+
+    function getWaterCount() {
+      const stored = localStorage.getItem('daily_water_' + getTodayKey());
+      return stored !== null ? parseInt(stored, 10) : 0;
+    }
+
+    function updateWaterUI(count) {
+      const el = document.getElementById('water-count-display');
+      if (el) el.textContent = `${count} / 8 Glasses`;
+    }
+
+    function loadWater() {
+      const count = getWaterCount();
+      updateWaterUI(count);
+    }
+
+    async function logWater(delta) {
+      if (!currentProfile) return;
+      let count = getWaterCount() + delta;
+      if (count < 0) count = 0;
+      if (count > 30) count = 30;
+
+      localStorage.setItem('daily_water_' + getTodayKey(), count);
+      updateWaterUI(count);
+
+      if (db && db.objectStoreNames && db.objectStoreNames.contains('water')) {
+        try {
+          await dbPut('water', { id: getTodayKey(), profileId: currentProfile.id, count });
+        } catch (err) {}
+      }
+    }
+
+    function resetWater() {
+      if (!currentProfile) return;
+      if (confirm("Reset today's water count back to 0?")) {
+        localStorage.setItem('daily_water_' + getTodayKey(), 0);
+        updateWaterUI(0);
+        if (db && db.objectStoreNames && db.objectStoreNames.contains('water')) {
+          dbPut('water', { id: getTodayKey(), profileId: currentProfile.id, count: 0 });
+        }
+      }
+    }
+
+    /* 7-DAY TASKS (Fail-Safe Storage) */
+    function getNext7DaysRange() {
+      const dates = [];
+      for (let i = 0; i < 7; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() + i);
+        dates.push(d.toISOString().slice(0, 10));
+      }
+      return dates;
+    }
+
+    function buildUpcoming7DaySelector() {
+      const container = document.getElementById('upcoming-seven-days-strip');
+      if (!container) return;
+      container.innerHTML = '';
+      for (let i = 0; i < 7; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() + i);
+        const iso = d.toISOString().slice(0, 10);
+        const btn = document.createElement('button');
+        btn.onclick = () => {
+          activeTodoDate = iso;
+          isViewingAllSevenDays = false;
+          document.getElementById('task-date-input').value = iso;
+          buildUpcoming7DaySelector();
+          renderTodoList();
+        };
+        btn.className = `btn-touch flex-shrink-0 flex flex-col items-center justify-center px-4 py-2 rounded-2xl border-2 cursor-pointer ${(!isViewingAllSevenDays && activeTodoDate === iso) ? 'bg-brand-600 text-white border-brand-700' : 'bg-slate-50 border-slate-300'}`;
+        btn.innerHTML = `<span class="text-xs font-bold uppercase">${i === 0 ? 'Today' : (i === 1 ? 'Tomorrow' : d.toLocaleDateString(undefined, { weekday: 'short' }))}</span><span class="text-base font-extrabold">${d.getDate()} ${d.toLocaleDateString(undefined, { month: 'short' })}</span>`;
+        container.appendChild(btn);
+      }
+    }
+
+    function viewAllUpcomingSevenDays() {
+      isViewingAllSevenDays = !isViewingAllSevenDays;
+      buildUpcoming7DaySelector();
+      renderTodoList();
+    }
+
+    async function handleAddTask(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      if (!currentProfile) {
+        alert("Please sign in first.");
+        return;
+      }
+
+      const input = document.getElementById('task-input');
+      const desc = (input.value || '').trim();
+      const targetDate = document.getElementById('task-date-input').value;
+      const scheduledTime = document.getElementById('task-time-input').value;
+
+      if (!desc) {
+        input.focus();
+        return;
+      }
+
+      const newTask = {
+        id: Date.now(),
+        profileId: currentProfile.id,
+        title: desc,
+        targetDate: targetDate,
+        scheduledTime: scheduledTime || null,
+        done: false
+      };
+
+      let localTodos = [];
+      try {
+        localTodos = JSON.parse(localStorage.getItem('daily_helper_todos_' + currentProfile.id) || '[]');
+      } catch (err) {
+        localTodos = [];
+      }
+      localTodos.push(newTask);
+      localStorage.setItem('daily_helper_todos_' + currentProfile.id, JSON.stringify(localTodos));
+
+      try {
+        await dbPut('todos', newTask);
+      } catch (err) {
+        console.warn('DB async save:', err);
+      }
+
+      input.value = '';
+      activeTodoDate = targetDate;
+      buildUpcoming7DaySelector();
+
+      await loadUserData();
+    }
+
+    async function toggleTodo(id) {
+      const t = userTodos.find(x => x.id === id);
+      if (t) {
+        t.done = !t.done;
+        
+        let localTodos = [];
+        try {
+          localTodos = JSON.parse(localStorage.getItem('daily_helper_todos_' + currentProfile.id) || '[]');
+        } catch (err) {}
+        const idx = localTodos.findIndex(x => x.id === id);
+        if (idx !== -1) {
+          localTodos[idx].done = t.done;
+          localStorage.setItem('daily_helper_todos_' + currentProfile.id, JSON.stringify(localTodos));
+        }
+
+        await dbPut('todos', t);
+        renderTodoList();
+      }
+    }
+
+    async function deleteTodo(id) {
+      let localTodos = [];
+      try {
+        localTodos = JSON.parse(localStorage.getItem('daily_helper_todos_' + currentProfile.id) || '[]');
+      } catch (err) {}
+      localTodos = localTodos.filter(x => x.id !== id);
+      localStorage.setItem('daily_helper_todos_' + currentProfile.id, JSON.stringify(localTodos));
+
+      await dbDelete('todos', id);
+      await loadUserData();
+    }
+
+    function renderTaskCard(t, container) {
+      const div = document.createElement('div');
+      div.className = `p-4 rounded-2xl border-2 flex items-center justify-between gap-3 ${t.done ? 'bg-slate-50 border-slate-200 line-through text-slate-400' : 'bg-white border-slate-300'}`;
+      div.innerHTML = `
+        <div class="flex items-center gap-3">
+          <input type="checkbox" ${t.done ? 'checked' : ''} onchange="toggleTodo(${t.id})" class="accent-brand-600">
+          <div>
+            <span class="font-bold text-lg text-slate-900">${t.title}</span>
+            ${t.scheduledTime ? `<span class="ml-2 text-xs bg-blue-50 text-brand-700 px-2 py-0.5 rounded font-semibold border border-blue-200">⏰ ${t.scheduledTime}</span>` : ''}
+          </div>
+        </div>
+        <button onclick="deleteTodo(${t.id})" class="text-red-600 px-2 font-bold cursor-pointer">🗑️</button>
+      `;
+      container.appendChild(div);
+    }
+
+    function renderTodoList() {
+      const c = document.getElementById('todo-list');
+      if (!c) return;
+      c.innerHTML = '';
+
+      const sevenDays = getNext7DaysRange();
+      const allSevenDayTasks = userTodos.filter(t => sevenDays.includes(t.targetDate));
+      
+      const metricsEl = document.getElementById('seven-day-plan-metrics');
+      if (metricsEl) {
+        metricsEl.textContent = `${allSevenDayTasks.length} Planned`;
+      }
+
+      const toggleBtn = document.getElementById('txt-view-all-todos');
+      const titleEl = document.getElementById('todo-list-title');
+
+      if (isViewingAllSevenDays) {
+        if (toggleBtn) toggleBtn.textContent = "📅 Show Only Selected Day";
+        if (titleEl) titleEl.textContent = "Entire 7-Day Task Plan";
+
+        if (allSevenDayTasks.length === 0) {
+          c.innerHTML = '<p class="text-slate-400 text-center py-6">No tasks scheduled across the next 7 days.</p>';
+          return;
+        }
+
+        sevenDays.forEach(dateStr => {
+          const dayTasks = allSevenDayTasks.filter(t => t.targetDate === dateStr);
+          if (dayTasks.length > 0) {
+            const dateObj = new Date(dateStr + 'T00:00:00');
+            const header = document.createElement('div');
+            header.className = "pt-3 pb-1 text-xs font-bold uppercase tracking-wider text-brand-700 flex items-center gap-2";
+            header.innerHTML = `<span>🗓️ ${dateObj.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })}</span>`;
+            c.appendChild(header);
+
+            dayTasks.forEach(t => renderTaskCard(t, c));
+          }
+        });
+        return;
+      }
+
+      // Single Day View
+      if (toggleBtn) toggleBtn.textContent = "📋 View Entire 7-Day Plan";
+      if (titleEl) titleEl.textContent = "Tasks for Selected Day";
+
+      const filtered = userTodos.filter(t => t.targetDate === activeTodoDate);
+      const counterEl = document.getElementById('task-counter');
+      if (counterEl) {
+        counterEl.textContent = `${filtered.filter(x => x.done).length} of ${filtered.length} Done`;
+      }
+
+      if (filtered.length === 0) {
+        c.innerHTML = '<p class="text-slate-400 text-center py-6">No tasks scheduled for this day.</p>';
+        return;
+      }
+
+      filtered.forEach(t => renderTaskCard(t, c));
+    }
+
+    /* EXPENSES (User-Scoped) */
+    function populateYearDropdown() {
+      const s = document.getElementById('filter-year');
+      s.innerHTML = '<option value="ALL">All Years</option>';
+      for (let y = 2026; y >= 2022; y--) s.innerHTML += `<option value="${y}">Year ${y}</option>`;
+    }
+
+    function previewSelectedImage(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const r = new FileReader();
+      r.onload = (evt) => {
+        const img = new Image();
+        img.onload = () => {
+          const cvs = document.createElement('canvas');
+          let w = img.width, h = img.height;
+          const max = 1000;
+          if (w > max || h > max) {
+            if (w > h) { h = Math.round(h * max / w); w = max; }
+            else { w = Math.round(w * max / h); h = max; }
+          }
+          cvs.width = w; cvs.height = h;
+          cvs.getContext('2d').drawImage(img, 0, 0, w, h);
+          currentExpImage = cvs.toDataURL('image/jpeg', 0.7);
+        };
+        img.src = evt.target.result;
+      };
+      r.readAsDataURL(file);
+    }
+
+    async function handleSaveExpense(e) {
+      e.preventDefault();
+      if (!currentProfile) return;
+      const desc = document.getElementById('exp-desc').value.trim();
+      const amount = parseFloat(document.getElementById('exp-amount').value);
+      const category = document.getElementById('exp-category').value;
+      const date = document.getElementById('exp-date').value;
+      await dbPut('expenses', {
+        id: Date.now(),
+        profileId: currentProfile.id,
+        desc,
+        amount,
+        category,
+        date,
+        image: currentExpImage
+      });
+      document.getElementById('exp-desc').value = '';
+      document.getElementById('exp-amount').value = '';
+      currentExpImage = null;
+      await loadUserData();
+    }
+
+    function applyExpenseFilters() { renderExpenseList(); }
+
+    function renderExpenseList() {
+      const c = document.getElementById('expense-list-container');
+      c.innerHTML = '';
+      const query = (document.getElementById('filter-keyword')?.value || '').toLowerCase();
+      const yr = document.getElementById('filter-year')?.value || 'ALL';
+      const cat = document.getElementById('filter-category')?.value || 'ALL';
+      const today = new Date().toISOString().slice(0, 10);
+
+      const todayTotal = userExpenses.filter(x => x.date === today).reduce((acc, curr) => acc + curr.amount, 0);
+      document.getElementById('expense-today-total').textContent = todayTotal.toFixed(2);
+
+      const filtered = userExpenses.filter(x => {
+        const matchesQuery = !query || x.desc.toLowerCase().includes(query);
+        const matchesYr = yr === 'ALL' || x.date.startsWith(yr);
+        const matchesCat = cat === 'ALL' || x.category === cat;
+        return matchesQuery && matchesYr && matchesCat;
+      });
+
+      const filteredTotal = filtered.reduce((acc, curr) => acc + curr.amount, 0);
+      document.getElementById('expense-filtered-total').textContent = filteredTotal.toFixed(2);
+
+      filtered.forEach(x => {
+        const div = document.createElement('div');
+        div.className = "p-4 rounded-2xl bg-white border-2 border-slate-200 flex justify-between items-center";
+        div.innerHTML = `
+          <div>
+            <h4 class="font-bold text-slate-900">${x.desc}</h4>
+            <span class="text-xs text-slate-500">${x.category} • ${x.date}</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="font-extrabold text-slate-900 text-lg">₹${x.amount.toFixed(2)}</span>
+            <button onclick="dbDelete('expenses', ${x.id}).then(loadUserData)" class="text-red-600 font-bold cursor-pointer">🗑️</button>
+          </div>
+        `;
+        c.appendChild(div);
+      });
+    }
+
+    /* MEDICINES (User-Scoped) */
+    function buildMedUpcoming7DaySelector() {
+      const c = document.getElementById('med-upcoming-seven-days-strip');
+      c.innerHTML = '';
+      for (let i = 0; i < 7; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() + i);
+        const iso = d.toISOString().slice(0, 10);
+        const btn = document.createElement('button');
+        btn.onclick = () => { activeMedDate = iso; buildMedUpcoming7DaySelector(); renderMedicineView(); };
+        btn.className = `btn-touch flex-shrink-0 flex flex-col items-center justify-center px-4 py-2 rounded-2xl border-2 cursor-pointer ${activeMedDate === iso ? 'bg-brand-600 text-white border-brand-700' : 'bg-slate-50 border-slate-300'}`;
+        btn.innerHTML = `<span class="text-xs font-bold uppercase">${i === 0 ? 'Today' : (i === 1 ? 'Tomorrow' : d.toLocaleDateString(undefined, { weekday: 'short' }))}</span><span class="text-base font-extrabold">${d.getDate()} ${d.toLocaleDateString(undefined, { month: 'short' })}</span>`;
+        c.appendChild(btn);
+      }
+    }
+
+    function openAddMedicineModal() { document.getElementById('med-modal').classList.remove('hidden'); document.getElementById('med-modal').classList.add('flex'); }
+    function closeAddMedicineModal() { document.getElementById('med-modal').classList.add('hidden'); document.getElementById('med-modal').classList.remove('flex'); }
+
+    async function handleSaveMedicine(e) {
+      e.preventDefault();
+      if (!currentProfile) return;
+      const name = document.getElementById('med-name').value.trim();
+      const dosage = document.getElementById('med-dosage').value.trim();
+      const food = document.getElementById('med-food').value;
+      const slots = {
+        morning: document.getElementById('slot-chk-morning').checked,
+        afternoon: document.getElementById('slot-chk-afternoon').checked,
+        evening: document.getElementById('slot-chk-evening').checked,
+        night: document.getElementById('slot-chk-night').checked
+      };
+      await dbPut('medicines', {
+        id: Date.now(),
+        profileId: currentProfile.id,
+        name,
+        dosage,
+        food,
+        slots
+      });
+      closeAddMedicineModal();
+      await loadUserData();
+    }
+
+    async function toggleDose(medId, slot) {
+      if (!currentProfile) return;
+      const logId = `${currentProfile.id}_${activeMedDate}_${medId}_${slot}`;
+      const existing = userMedLogs.find(x => x.id === logId);
+      if (existing) await dbDelete('medLogs', logId);
+      else await dbPut('medLogs', {
+        id: logId,
+        profileId: currentProfile.id,
+        date: activeMedDate,
+        medId,
+        slot,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      });
+      await loadUserData();
+    }
+
+    function renderMedicineView() {
+      const t = I18N[currentLang] || I18N.en;
+      ['morning', 'afternoon', 'evening', 'night'].forEach(slot => {
+        const c = document.getElementById(`slot-list-${slot}`);
+        c.innerHTML = '';
+        const medsInSlot = userMeds.filter(m => m.slots && m.slots[slot]);
+        if (medsInSlot.length === 0) { c.innerHTML = '<p class="text-sm text-slate-400 italic">No medicines for this slot.</p>'; return; }
+        medsInSlot.forEach(m => {
+          const logId = `${currentProfile.id}_${activeMedDate}_${m.id}_${slot}`;
+          const isTaken = userMedLogs.some(l => l.id === logId);
+          const div = document.createElement('div');
+          div.className = `p-4 rounded-2xl border-2 flex justify-between items-center ${isTaken ? 'bg-emerald-50 border-emerald-300' : 'bg-white border-slate-300'}`;
+          div.innerHTML = `
+            <div>
+              <h4 class="text-lg font-bold ${isTaken ? 'line-through text-slate-400' : 'text-slate-900'}">${m.name}</h4>
+              <span class="text-xs bg-slate-100 px-2 py-0.5 rounded font-bold">${m.dosage}</span>
+              <span class="text-xs text-slate-500">• ${m.food}</span>
+            </div>
+            <button onclick="toggleDose(${m.id}, '${slot}')" class="btn-touch px-4 rounded-xl font-bold text-sm cursor-pointer ${isTaken ? 'bg-emerald-600 text-white' : 'bg-brand-600 text-white'}">
+              ${isTaken ? t.takenBadge : t.markTaken}
+            </button>
+          `;
+          c.appendChild(div);
+        });
+      });
+    }
+
+    /* WHERE DID I KEEP IT? (User-Scoped) */
+    async function handleSaveWhereItem(e) {
+      e.preventDefault();
+      if (!currentProfile) return;
+      const item = document.getElementById('where-item').value.trim();
+      const room = document.getElementById('where-room').value;
+      const loc = document.getElementById('where-loc').value.trim();
+      await dbPut('whereItems', {
+        id: Date.now(),
+        profileId: currentProfile.id,
+        item,
+        room,
+        loc,
+        date: new Date().toLocaleDateString()
+      });
+      document.getElementById('where-item').value = '';
+      document.getElementById('where-loc').value = '';
+      await loadUserData();
+    }
+
+    function renderWhereList() {
+      const c = document.getElementById('where-list');
+      c.innerHTML = '';
+      const q = (document.getElementById('where-search')?.value || '').toLowerCase();
+      const filtered = userWhere.filter(x => !q || x.item.toLowerCase().includes(q) || x.loc.toLowerCase().includes(q));
+      filtered.forEach(x => {
+        const div = document.createElement('div');
+        div.className = "p-4 rounded-2xl bg-white border-2 border-slate-200 flex justify-between items-start";
+        div.innerHTML = `
+          <div>
+            <h4 class="font-extrabold text-lg text-brand-800">${x.item}</h4>
+            <div class="my-1.5 p-2.5 bg-emerald-50 rounded-xl font-bold text-emerald-950 border border-emerald-200">📍 ${x.loc}</div>
+            <span class="text-xs text-slate-500 font-semibold">${x.room} • Logged: ${x.date}</span>
+          </div>
+          <button onclick="dbDelete('whereItems', ${x.id}).then(loadUserData)" class="text-red-600 font-bold p-2 cursor-pointer">🗑️</button>
+        `;
+        c.appendChild(div);
+      });
+    }
+
+    /* RECURRING BILLS (User-Scoped) */
+    async function handleSaveBill(e) {
+      e.preventDefault();
+      if (!currentProfile) return;
+      const name = document.getElementById('bill-name').value.trim();
+      const dueDate = document.getElementById('bill-due-date').value;
+      const amount = document.getElementById('bill-amount').value || '—';
+      const freq = document.getElementById('bill-freq').value;
+      await dbPut('bills', {
+        id: Date.now(),
+        profileId: currentProfile.id,
+        name,
+        dueDate,
+        amount,
+        freq,
+        paid: false
+      });
+      document.getElementById('bill-name').value = '';
+      await loadUserData();
+    }
+
+    async function toggleBillPaid(id) {
+      const b = userBills.find(x => x.id === id);
+      if (b) { b.paid = !b.paid; await dbPut('bills', b); renderBillsList(); }
+    }
+
+    function renderBillsList() {
+      const c = document.getElementById('bills-list');
+      c.innerHTML = '';
+      const today = new Date().toISOString().slice(0, 10);
+      userBills.sort((a,b) => a.dueDate.localeCompare(b.dueDate)).forEach(b => {
+        const isOverdue = b.dueDate < today && !b.paid;
+        const div = document.createElement('div');
+        div.className = `p-4 rounded-2xl border-2 flex justify-between items-center ${b.paid ? 'bg-slate-50 border-slate-200 line-through' : 'bg-white border-slate-300'}`;
+        div.innerHTML = `
+          <div>
+            <h4 class="font-bold text-lg text-slate-900">${b.name}</h4>
+            <div class="text-xs text-slate-500 font-semibold">Due: ${b.dueDate} • Approx: ₹${b.amount} (${b.freq})</div>
+            <span class="text-xs font-bold px-2 py-0.5 rounded ${b.paid ? 'bg-emerald-100 text-emerald-800' : (isOverdue ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800')}">
+              ${b.paid ? '✅ Paid' : (isOverdue ? '⚠️ Overdue' : '⏳ Upcoming')}
+            </span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="toggleBillPaid(${b.id})" class="btn-touch px-3 rounded-xl border font-bold text-sm bg-slate-100 cursor-pointer">${b.paid ? 'Mark Unpaid' : 'Mark Paid'}</button>
+            <button onclick="dbDelete('bills', ${b.id}).then(loadUserData)" class="text-red-600 font-bold p-2 cursor-pointer">🗑️</button>
+          </div>
+        `;
+        c.appendChild(div);
+      });
+    }
+
+    /* HEALTH VITALS (User-Scoped) */
+    async function handleSaveVital(e) {
+      e.preventDefault();
+      if (!currentProfile) return;
+      const sys = document.getElementById('vital-sys').value;
+      const dia = document.getElementById('vital-dia').value;
+      const pulse = document.getElementById('vital-pulse').value;
+      const sugar = document.getElementById('vital-sugar').value;
+      const sugarType = document.getElementById('vital-sugar-type').value;
+      await dbPut('vitals', {
+        id: Date.now(),
+        profileId: currentProfile.id,
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
+        sys: sys || '—',
+        dia: dia || '—',
+        pulse: pulse || '—',
+        sugar: sugar || '—',
+        sugarType
+      });
+      await loadUserData();
+    }
+
+    function renderVitalsList() {
+      const c = document.getElementById('vitals-list');
+      c.innerHTML = '';
+      userVitals.slice(0, 10).forEach(v => {
+        const div = document.createElement('div');
+        div.className = "p-4 rounded-2xl bg-white border-2 border-slate-200 flex justify-between items-center";
+        div.innerHTML = `
+          <div>
+            ${v.sys !== '—' ? `<h4 class="font-bold text-lg text-slate-900">BP: ${v.sys}/${v.dia} mmHg (Pulse:${v.pulse})</h4>` : ''}
+            ${v.sugar !== '—' ? `<h4 class="font-bold text-lg text-brand-700">Sugar: ${v.sugar} mg/dL (${v.sugarType})</h4>` : ''}
+            <span class="text-xs text-slate-500">${v.date} at ${v.time}</span>
+          </div>
+          <button onclick="dbDelete('vitals', ${v.id}).then(loadUserData)" class="text-red-600 font-bold p-2 cursor-pointer">🗑️</button>
+        `;
+        c.appendChild(div);
+      });
+    }
+
+    /* CONTACTS (User-Scoped) */
+    async function handleSaveContact(e) {
+      e.preventDefault();
+      if (!currentProfile) return;
+      const name = document.getElementById('contact-name').value.trim();
+      const phone = document.getElementById('contact-phone').value.trim();
+      const category = document.getElementById('contact-category').value;
+      const note = document.getElementById('contact-note').value.trim();
+      await dbPut('contacts', {
+        id: Date.now(),
+        profileId: currentProfile.id,
+        name,
+        phone,
+        category,
+        note
+      });
+      document.getElementById('contact-name').value = '';
+      document.getElementById('contact-phone').value = '';
+      await loadUserData();
+    }
+
+    function renderContactsList() {
+      const c = document.getElementById('contacts-list');
+      c.innerHTML = '';
+      const t = I18N[currentLang] || I18N.en;
+      userContacts.forEach(x => {
+        const clean = x.phone.replace(/[^0-9]/g, '');
+        const div = document.createElement('div');
+        div.className = "p-4 rounded-2xl bg-white border-2 border-slate-200 flex justify-between items-center gap-3";
+        div.innerHTML = `
+          <div>
+            <h4 class="font-bold text-lg text-slate-900">${x.name}</h4>
+            <div class="text-sm font-semibold text-slate-600">${x.phone} • <span class="text-xs bg-slate-100 px-2 py-0.5 rounded font-bold">${x.category}</span></div>
+            ${x.note ? `<span class="text-xs text-slate-500 italic">${x.note}</span>` : ''}
+          </div>
+          <div class="flex gap-2">
+            <a href="tel:${clean}" class="btn-touch px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm">${t.callNow}</a>
+            <a href="https://wa.me/91${clean}" target="_blank" class="btn-touch px-3 rounded-xl bg-green-500 text-white font-bold text-sm">💬 WA</a>
+            <button onclick="dbDelete('contacts', ${x.id}).then(loadUserData)" class="text-red-600 font-bold px-2 cursor-pointer">🗑️</button>
+          </div>
+        `;
+        c.appendChild(div);
+      });
+    }
+
+    /* SPEECH DICTATION */
+    function startDictation(inputId) {
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) return alert("Voice input requires Google Chrome.");
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const r = new SpeechRecognition();
+      r.lang = currentLang === 'or' ? 'or-IN' : (currentLang === 'hi' ? 'hi-IN' : (currentLang === 'bn' ? 'bn-IN' : 'en-IN'));
+      r.onresult = (evt) => { document.getElementById(inputId).value = evt.results[0][0].transcript; };
+      r.start();
+    }
+
+    /* BACKUP */
+    async function downloadDatabaseBackup() {
+      const data = {
+        profiles: await dbGetAll('profiles'),
+        todos: await dbGetAll('todos'),
+        expenses: await dbGetAll('expenses'),
+        medicines: await dbGetAll('medicines'),
+        medLogs: await dbGetAll('medLogs'),
+        whereItems: await dbGetAll('whereItems'),
+        bills: await dbGetAll('bills'),
+        vitals: await dbGetAll('vitals'),
+        contacts: await dbGetAll('contacts'),
+        water: await dbGetAll('water'),
+        date: new Date().toISOString()
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `Daily_Helper_MultiUser_Backup_${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+    }
+  </script>
+</body>
+</html>
